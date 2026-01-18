@@ -141,6 +141,9 @@ function createStepsSection(steps) {
   // Group by phase - combine FILL and SUBMIT into ACTIONS
   const phases = { ACTIONS: [], ASSERTIONS: [] };
   steps.forEach(step => {
+    // Filter: Only show steps with screenshots (User Request)
+    if (!step.screenshotPath) return;
+
     if (step.phase === 'FILL' || step.phase === 'SUBMIT') {
       phases.ACTIONS.push(step);
     } else if (step.phase === 'ASSERT') {

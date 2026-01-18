@@ -288,9 +288,9 @@ body {
 }
 
 .step-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
 }
 
 .step-item {
@@ -298,10 +298,10 @@ body {
   border-radius: var(--radius-sm);
   padding: var(--spacing-md);
   border-left: 3px solid var(--status-pending);
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: var(--spacing-md);
-  align-items: center;
+  display: flex; /* Flex is better for Card layout content flow */
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  height: 100%;
 }
 
 .step-item.status-pass {
@@ -353,16 +353,18 @@ body {
 }
 
 .screenshot-thumb {
-  max-width: 150px;
-  max-height: 100px;
+  max-width: 100%;
+  max-height: 250px;
   border-radius: var(--radius-sm);
   cursor: pointer;
   border: 2px solid var(--border-color);
   transition: all 0.3s ease;
+  object-fit: cover;
+  align-self: center;
 }
 
 .screenshot-thumb:hover {
-  transform: scale(1.05);
+  transform: scale(1.02);
   border-color: var(--accent-primary);
   box-shadow: var(--shadow-lg);
 }
@@ -527,8 +529,9 @@ body {
     font-size: 1.5rem;
   }
 
-  .dashboard-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .dashboard-grid,
+  .step-list {
+    grid-template-columns: 1fr;
   }
 
   .test-children {
