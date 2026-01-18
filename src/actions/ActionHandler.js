@@ -13,45 +13,47 @@ class ActionHandler {
   /**
    * Fill input field
    */
-  async fillInput(selector, value, testName, stepIndex) {
+  async fillInput(selector, value, testName, stepIndex, capture = false) {
     const step = new StepReport('FILL', 'input', selector, value);
     step.start();
 
     try {
-      Logger.step(`Filling input: ${selector}`);
+      Logger.step(`Filling input: ${selector}${capture ? ' (with capture)' : ''}`);
       await this.page.fill(selector, value);
-      
+
       // Small delay for UI update
       await this.page.waitForTimeout(300);
-      
+
       step.pass();
-      
-      // Capture screenshot after filling
-      const screenshot = await this.screenshotManager.capture(
-        this.page, 
-        testName, 
-        'FILL', 
-        stepIndex
-      );
-      if (screenshot) {
-        step.attachScreenshot(screenshot);
+
+      // Capture screenshot after filling if requested
+      if (capture) {
+        const screenshot = await this.screenshotManager.capture(
+          this.page,
+          testName,
+          'FILL',
+          stepIndex
+        );
+        if (screenshot) {
+          step.attachScreenshot(screenshot);
+        }
       }
-      
+
       return step;
     } catch (error) {
       Logger.error(`Failed to fill input ${selector}: ${error.message}`);
       step.fail(error);
-      
+
       // Capture failure screenshot
       const screenshot = await this.screenshotManager.captureOnFailure(
-        this.page, 
-        testName, 
+        this.page,
+        testName,
         stepIndex
       );
       if (screenshot) {
         step.attachScreenshot(screenshot);
       }
-      
+
       return step;
     }
   }
@@ -59,43 +61,44 @@ class ActionHandler {
   /**
    * Click element
    */
-  async click(selector, testName, stepIndex, phase = 'SUBMIT') {
+  async click(selector, testName, stepIndex, phase = 'SUBMIT', capture = false) {
     const step = new StepReport(phase, 'click', selector);
     step.start();
 
     try {
-      Logger.step(`Clicking: ${selector}`);
-      
-      // Capture screenshot before click (especially for submit)
-      if (phase === 'SUBMIT') {
-        const beforeScreenshot = await this.screenshotManager.captureBeforeSubmit(
-          this.page, 
-          testName, 
+      Logger.step(`Clicking: ${selector}${capture ? ' (with capture)' : ''}`);
+
+      // Capture screenshot before/after click if requested
+      if (capture) {
+        const screenshot = await this.screenshotManager.capture(
+          this.page,
+          testName,
+          phase,
           stepIndex
         );
-        if (beforeScreenshot) {
-          step.attachScreenshot(beforeScreenshot);
+        if (screenshot) {
+          step.attachScreenshot(screenshot);
         }
       }
-      
+
       await this.page.click(selector);
       step.pass();
-      
+
       return step;
     } catch (error) {
       Logger.error(`Failed to click ${selector}: ${error.message}`);
       step.fail(error);
-      
+
       // Capture failure screenshot
       const screenshot = await this.screenshotManager.captureOnFailure(
-        this.page, 
-        testName, 
+        this.page,
+        testName,
         stepIndex
       );
       if (screenshot) {
         step.attachScreenshot(screenshot);
       }
-      
+
       return step;
     }
   }
@@ -103,36 +106,37 @@ class ActionHandler {
   /**
    * Handle dialog (alert, confirm, prompt)
    */
-  async handleDialog(action, testName, stepIndex) {
+  async handleDialog(action, testName, stepIndex, capture = false) {
     const step = new StepReport('SUBMIT', 'dialog', 'dialog', action);
     step.start();
 
     try {
-      Logger.step(`Handling dialog: ${action}`);
-      
+      Logger.step(`Handling dialog: ${action}${capture ? ' (with capture)' : ''}`);
+
       // Set up dialog handler
       this.page.once('dialog', async dialog => {
         Logger.info(`Dialog detected: ${dialog.message()}`);
-        
-        // Capture screenshot of dialog
-        const screenshot = await this.screenshotManager.capture(
-          this.page, 
-          testName, 
-          'DIALOG', 
-          stepIndex
-        );
-        if (screenshot) {
-          step.attachScreenshot(screenshot);
-        }
-        
+
         if (action === 'accept') {
           await dialog.accept();
         } else {
           await dialog.dismiss();
         }
       });
-      
+
       step.pass();
+      // Capture screenshot of dialog if requested
+      if (capture) {
+        const screenshot = await this.screenshotManager.capture(
+          this.page,
+          testName,
+          'DIALOG',
+          stepIndex
+        );
+        if (screenshot) {
+          step.attachScreenshot(screenshot);
+        }
+      }
       return step;
     } catch (error) {
       Logger.error(`Failed to handle dialog: ${error.message}`);
@@ -152,17 +156,17 @@ class ActionHandler {
       Logger.step('Waiting for navigation...');
       await this.page.waitForLoadState('networkidle', { timeout });
       step.pass();
-      
+
       // Capture screenshot after navigation
       const screenshot = await this.screenshotManager.captureAfterNavigation(
-        this.page, 
-        testName, 
+        this.page,
+        testName,
         stepIndex
       );
       if (screenshot) {
         step.attachScreenshot(screenshot);
       }
-      
+
       return step;
     } catch (error) {
       Logger.error(`Navigation failed: ${error.message}`);
@@ -182,32 +186,32 @@ class ActionHandler {
       Logger.step(`Navigating to: ${url}`);
       await this.page.goto(url, { waitUntil: 'networkidle' });
       step.pass();
-      
+
       // Capture screenshot after navigation
       const screenshot = await this.screenshotManager.capture(
-        this.page, 
-        testName, 
-        'NAVIGATION', 
+        this.page,
+        testName,
+        'NAVIGATION',
         stepIndex
       );
       if (screenshot) {
         step.attachScreenshot(screenshot);
       }
-      
+
       return step;
     } catch (error) {
       Logger.error(`Failed to navigate to ${url}: ${error.message}`);
       step.fail(error);
-      
+
       const screenshot = await this.screenshotManager.captureOnFailure(
-        this.page, 
-        testName, 
+        this.page,
+        testName,
         stepIndex
       );
       if (screenshot) {
         step.attachScreenshot(screenshot);
       }
-      
+
       return step;
     }
   }

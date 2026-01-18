@@ -11,7 +11,7 @@ class Logger {
     yellow: '\x1b[33m',
     blue: '\x1b[34m',
     cyan: '\x1b[36m',
-    gray: '\x1b[90m'
+    gray: '\x1b[90m',
   };
 
   static getTimestamp() {
@@ -22,36 +22,47 @@ class Logger {
   static info(message) {
     console.log(
       `${this.colors.gray}[${this.getTimestamp()}]${this.colors.reset} ` +
-      `${this.colors.blue}INFO${this.colors.reset}  ${message}`
+        `${this.colors.blue}INFO${this.colors.reset}  ${message}`
     );
   }
 
   static success(message) {
     console.log(
       `${this.colors.gray}[${this.getTimestamp()}]${this.colors.reset} ` +
-      `${this.colors.green}✓${this.colors.reset}     ${message}`
+        `${this.colors.green}✓${this.colors.reset}     ${message}`
     );
   }
 
   static error(message) {
     console.log(
       `${this.colors.gray}[${this.getTimestamp()}]${this.colors.reset} ` +
-      `${this.colors.red}ERROR${this.colors.reset} ${message}`
+        `${this.colors.red}ERROR${this.colors.reset} ${message}`
     );
   }
 
   static warn(message) {
     console.log(
       `${this.colors.gray}[${this.getTimestamp()}]${this.colors.reset} ` +
-      `${this.colors.yellow}WARN${this.colors.reset}  ${message}`
+        `${this.colors.yellow}WARN${this.colors.reset}  ${message}`
     );
   }
 
   static step(message) {
     console.log(
       `${this.colors.gray}[${this.getTimestamp()}]${this.colors.reset} ` +
-      `${this.colors.cyan}→${this.colors.reset}     ${message}`
+        `${this.colors.cyan}→${this.colors.reset}     ${message}`
     );
+  }
+
+  static debug(message) {
+    // Only log debug messages in verbose mode
+    // For now, silently ignore (can be enabled with DEBUG env var)
+    if (process.env.DEBUG === 'true') {
+      console.log(
+        `${this.colors.gray}[${this.getTimestamp()}]${this.colors.reset} ` +
+          `${this.colors.dim}DEBUG${this.colors.reset} ${message}`
+      );
+    }
   }
 }
 

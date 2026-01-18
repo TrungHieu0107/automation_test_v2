@@ -16,12 +16,12 @@ class ReportManager {
    */
   createTestReport(testName, parentTest = null) {
     const testReport = new TestReport(testName, parentTest);
-    
+
     if (!parentTest) {
       // Root level test
       this.testReports.push(testReport);
     }
-    
+
     this.currentTest = testReport;
     return testReport;
   }

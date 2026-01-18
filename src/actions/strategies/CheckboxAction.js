@@ -8,18 +8,18 @@ import Logger from '../../utils/Logger.js';
 class CheckboxAction extends ActionStrategy {
   async execute(page, selector, value, options = {}) {
     await this.verifyElement(page, selector);
-    
+
     // Normalize value to boolean
     const shouldCheck = this.normalizeValue(value);
-    
+
     Logger.debug(`${shouldCheck ? 'Checking' : 'Unchecking'} checkbox: ${selector}`);
-    
+
     if (shouldCheck) {
       await page.check(selector);
     } else {
       await page.uncheck(selector);
     }
-    
+
     // Optional delay for UI updates
     const delay = options.delay || 300;
     await page.waitForTimeout(delay);
@@ -34,19 +34,19 @@ class CheckboxAction extends ActionStrategy {
     if (typeof value === 'boolean') {
       return value;
     }
-    
+
     const strValue = String(value).toLowerCase().trim();
-    
+
     // Truthy values
     if (['true', 'yes', '1', 'checked', 'check', 'on'].includes(strValue)) {
       return true;
     }
-    
+
     // Falsy values
     if (['false', 'no', '0', 'unchecked', 'uncheck', 'off', ''].includes(strValue)) {
       return false;
     }
-    
+
     // Default: any non-empty value is truthy
     return !!value;
   }

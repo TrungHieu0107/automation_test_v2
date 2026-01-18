@@ -17,7 +17,7 @@ class AssertionExecutor {
   /**
    * Execute assertion(s) based on configuration
    * Supports single or multiple assertions per step
-   * 
+   *
    * @param {object|array} assertConfig - Assertion configuration(s)
    * @param {string} testName - Test name for screenshot naming
    * @param {number} stepIndex - Step index for tracking
@@ -26,28 +26,24 @@ class AssertionExecutor {
   async execute(assertConfig, testName, stepIndex) {
     // Support both single assertion and array of assertions
     const assertions = Array.isArray(assertConfig) ? assertConfig : [assertConfig];
-    
+
     const stepReports = [];
-    
+
     for (let i = 0; i < assertions.length; i++) {
       const assert = assertions[i];
       const currentStepIndex = stepIndex + i;
-      
-      const stepReport = await this.executeSingleAssertion(
-        assert,
-        testName,
-        currentStepIndex
-      );
-      
+
+      const stepReport = await this.executeSingleAssertion(assert, testName, currentStepIndex);
+
       stepReports.push(stepReport);
-      
+
       // Stop on first failure if configured
       if (stepReport.status === 'FAIL' && assert.stopOnFailure !== false) {
         Logger.warn('Assertion failed, stopping remaining assertions');
         break;
       }
     }
-    
+
     return stepReports;
   }
 
@@ -58,7 +54,7 @@ class AssertionExecutor {
   async executeSingleAssertion(assertConfig, testName, stepIndex) {
     // Resolve selector
     const selector = this.selectorResolver.resolve(assertConfig.selector);
-    
+
     // Create step report
     const step = new StepReport(
       'ASSERT',
@@ -67,16 +63,16 @@ class AssertionExecutor {
       `expect: ${assertConfig.expected}`
     );
     step.start();
-    
+
     try {
       // Create assertion strategy
       const strategy = AssertionFactory.create(assertConfig.type);
-      
+
       Logger.step(
         `Asserting ${strategy.getAssertionType()}: ${selector} ` +
-        `${assertConfig.operator || '=='} "${assertConfig.expected}"`
+          `${assertConfig.operator || '=='} "${assertConfig.expected}"`
       );
-      
+
       // Execute assertion
       const result = await strategy.execute(
         this.page,
@@ -84,7 +80,7 @@ class AssertionExecutor {
         assertConfig.expected,
         assertConfig
       );
-      
+
       // Update step report based on result
       if (result.passed) {
         Logger.success(`✓ ${result.message}`);
@@ -95,36 +91,35 @@ class AssertionExecutor {
         const error = new Error(result.message);
         step.fail(error);
         step.value = `expected: ${result.expected}, actual: ${result.actual}`;
-        
+
         // Capture failure screenshot
         const screenshot = await this.screenshotManager.captureOnFailure(
           this.page,
           testName,
           stepIndex
         );
-        
+
         if (screenshot) {
           step.attachScreenshot(screenshot);
         }
       }
-      
+
       return step;
-      
     } catch (error) {
       Logger.error(`Assertion error: ${error.message}`);
       step.fail(error);
-      
+
       // Capture failure screenshot
       const screenshot = await this.screenshotManager.captureOnFailure(
         this.page,
         testName,
         stepIndex
       );
-      
+
       if (screenshot) {
         step.attachScreenshot(screenshot);
       }
-      
+
       return step;
     }
   }

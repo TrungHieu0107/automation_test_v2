@@ -41,9 +41,9 @@ class ScreenshotManager {
     try {
       const filename = this.generateFilename(testName, phase, stepIndex);
       const filepath = path.join(this.screenshotsDir, filename);
-      
+
       await page.screenshot({ path: filepath, fullPage: true });
-      
+
       // Return relative path for HTML report
       return `screenshots/${filename}`;
     } catch (error) {

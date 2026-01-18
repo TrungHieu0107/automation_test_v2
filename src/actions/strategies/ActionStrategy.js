@@ -2,14 +2,14 @@ import Logger from '../../utils/Logger.js';
 
 /**
  * Base class for action strategies (Strategy Pattern)
- * 
+ *
  * Each strategy knows how to execute a specific action on a specific element type
  * Single Responsibility: Define interface for action execution
  */
 class ActionStrategy {
   /**
    * Execute the action on the page
-   * 
+   *
    * @param {Page} page - Playwright page object
    * @param {string} selector - Resolved Playwright selector
    * @param {any} value - Value for the action (e.g., text to type, option to select)

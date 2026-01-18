@@ -2,8 +2,8 @@ browser:
   type: msedge
   headless: false
   viewport:
-    width: 1280
-    height: 720
+    width: 1535
+    height: 1024
 
 report:
   enabled: true
@@ -18,9 +18,9 @@ screenshots:
   # Fallback: Auto-capture before/after submit if no explicit captures
 
 testExecution:
-  stopOnChildFailure: false      # Continue with next child even if one fails
-  restoreBrowserState: true      # Navigate back to parent URL after each child
+  stopOnChildFailure: false # Continue with next child even if one fails
+  restoreBrowserState: true # Navigate back to parent URL after each child
 
 childTests:
-  validatePaths: true             # Validate child file paths before execution
-  detectCircularRefs: true        # Detect circular dependencies
+  validatePaths: true # Validate child file paths before execution
+  detectCircularRefs: true # Detect circular dependencies

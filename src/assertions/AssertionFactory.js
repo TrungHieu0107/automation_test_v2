@@ -18,28 +18,28 @@ class AssertionFactory {
       case 'textcontent':
       case 'text':
         return new TextContentAssertion();
-      
+
       case 'inputvalue':
       case 'value':
         return new InputValueAssertion();
-      
+
       case 'visibility':
       case 'visible':
       case 'hidden':
         return new VisibilityAssertion();
-      
+
       case 'enabled':
       case 'disabled':
         return new EnabledAssertion();
-      
+
       case 'style':
       case 'css':
         return new StyleAssertion();
-      
+
       default:
         throw new Error(
           `Unsupported assertion type: "${assertionType}". ` +
-          `Supported: textContent, inputValue, visibility, enabled, style`
+            `Supported: textContent, inputValue, visibility, enabled, style`
         );
     }
   }
@@ -49,13 +49,7 @@ class AssertionFactory {
    * @returns {string[]} Array of supported assertion type names
    */
   static getSupportedTypes() {
-    return [
-      'textContent',
-      'inputValue',
-      'visibility',
-      'enabled',
-      'style'
-    ];
+    return ['textContent', 'inputValue', 'visibility', 'enabled', 'style'];
   }
 }
 

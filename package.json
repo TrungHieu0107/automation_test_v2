@@ -6,14 +6,30 @@
   "type": "module",
   "scripts": {
     "test": "node index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "format": "prettier --write .",
+    "prepare": "husky"
   },
-  "keywords": ["automation", "testing", "playwright", "reporting", "yaml"],
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  },
+  "keywords": [
+    "automation",
+    "testing",
+    "playwright",
+    "reporting",
+    "yaml"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "playwright": "^1.40.0",
+    "fs-extra": "^11.2.0",
     "js-yaml": "^4.1.0",
-    "fs-extra": "^11.2.0"
+    "playwright": "^1.40.0"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.0"
   }
 }

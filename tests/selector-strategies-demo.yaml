@@ -8,19 +8,19 @@ fillData:
       by: css
       value: '.new-todo'
     value: 'Task via CSS'
-  
+
   # ID selector (adds # prefix)
   - selector:
       by: id
       value: new-todo
     value: 'Task via ID'
-  
+
   # Name selector (creates [name='...'])
   - selector:
       by: name
       value: task-name
     value: 'Task via name'
-  
+
   # XPath selector (adds xpath= prefix)
   - selector:
       by: xpath

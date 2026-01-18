@@ -2,14 +2,14 @@ import Logger from '../../utils/Logger.js';
 
 /**
  * Base class for assertion strategies (Strategy Pattern)
- * 
+ *
  * Each strategy knows how to validate a specific assertion type
  * Single Responsibility: Define interface for assertion execution
  */
 class AssertionStrategy {
   /**
    * Execute the assertion
-   * 
+   *
    * @param {Page} page - Playwright page object
    * @param {string} selector - Resolved Playwright selector
    * @param {any} expected - Expected value
@@ -39,7 +39,7 @@ class AssertionStrategy {
       passed: true,
       actual,
       expected,
-      message: message || `Assertion passed: ${actual} === ${expected}`
+      message: message || `Assertion passed: ${actual} === ${expected}`,
     };
   }
 
@@ -54,7 +54,7 @@ class AssertionStrategy {
       passed: false,
       actual,
       expected,
-      message
+      message,
     };
   }
 }

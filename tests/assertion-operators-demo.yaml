@@ -9,7 +9,7 @@ fillData:
 submit:
   - type: click
     selector: '.new-todo'
-  
+
   - type: waitForNavigation
     timeout: 2000
 
@@ -19,32 +19,32 @@ assertions:
     selector: '.todo-list li label'
     expected: 'Learn Playwright Testing Framework'
     operator: equals
-  
+
   - type: textContent
     selector: '.todo-list li label'
     expected: 'Playwright'
     operator: contains
-  
+
   - type: textContent
     selector: '.todo-list li label'
     expected: '^Learn.*Framework$'
     operator: regex
-  
+
   # Visibility assertion
   - type: visibility
     selector: '.todo-list'
     expected: visible
-  
+
   # InputValue assertion
   - type: inputValue
     selector: '.new-todo'
     expected: ''
     operator: equals
-  
+
   # Legacy assertions (backward compatibility)
   - type: exists
     selector: '.todoapp'
-  
+
   - type: text
     selector: '.todoapp h1'
     expectedText: 'todos'

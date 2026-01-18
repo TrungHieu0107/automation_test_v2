@@ -13,7 +13,7 @@ class XPathSelectorStrategy extends SelectorStrategy {
   resolve(selectorValue) {
     // Remove existing xpath prefix if present
     const xpath = selectorValue.replace(/^xpath=/, '');
-    
+
     // Add Playwright's xpath= prefix
     return `xpath=${xpath}`;
   }

@@ -6,8 +6,8 @@ url: https://demo.playwright.dev/todomvc/
 fillData:
   - selector: '.new-todo'
     value: 'Task 1'
-    capture: true  # Explicit capture HERE
-  
+    capture: true # Explicit capture HERE
+
   - selector: '.new-todo'
     value: 'Task 2'
     # No capture for this step

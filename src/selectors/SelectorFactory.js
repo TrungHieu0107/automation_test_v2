@@ -18,20 +18,19 @@ class SelectorFactory {
     switch (type?.toLowerCase()) {
       case 'id':
         return new IdSelectorStrategy();
-      
+
       case 'name':
         return new NameSelectorStrategy();
-      
+
       case 'css':
         return new CssSelectorStrategy();
-      
+
       case 'xpath':
         return new XPathSelectorStrategy();
-      
+
       default:
         throw new Error(
-          `Unsupported selector type: "${type}". ` +
-          `Supported types: id, name, css, xpath`
+          `Unsupported selector type: "${type}". ` + `Supported types: id, name, css, xpath`
         );
     }
   }

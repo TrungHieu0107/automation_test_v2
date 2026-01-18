@@ -7,14 +7,14 @@ fillData:
   # Legacy format (still supported)
   - selector: '.new-todo'
     value: 'Task 1: Learn selectors'
-  
+
   # New format: ID selector
   - selector:
       by: id
       value: new-todo
     value: 'Task 2: Master assertions'
-    capture: true  # Explicit screenshot capture after this step
-  
+    capture: true # Explicit screenshot capture after this step
+
   # New format: Name selector
   - selector:
       by: name
@@ -25,7 +25,7 @@ fillData:
 submit:
   - type: click
     selector: '.new-todo'
-  
+
   - type: waitForNavigation
     timeout: 2000
 
@@ -37,24 +37,24 @@ assertions:
     expected: 'todos'
     operator: equals
     timeout: 5000
-  
+
   # TextContent with contains operator
   - type: textContent
     selector: '.todo-list'
     expected: 'Learn selectors'
     operator: contains
-  
+
   # Visibility assertion
   - type: visibility
     selector: '.todo-list'
     expected: visible
-  
+
   # InputValue assertion (checking placeholder or value)
   - type: inputValue
     selector: '.new-todo'
     expected: ''
     operator: equals
-  
+
   # Legacy format (still supported)
   - type: exists
     selector: '.todoapp'

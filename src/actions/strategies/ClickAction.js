@@ -8,12 +8,12 @@ import Logger from '../../utils/Logger.js';
 class ClickAction extends ActionStrategy {
   async execute(page, selector, value, options = {}) {
     await this.verifyElement(page, selector);
-    
+
     Logger.debug(`Clicking element: ${selector}`);
-    
+
     // Perform click
     await page.click(selector);
-    
+
     // Optional delay after click
     const delay = options.delay || 300;
     await page.waitForTimeout(delay);

@@ -1,6 +1,6 @@
 /**
  * Base class for selector strategies (Strategy Pattern)
- * 
+ *
  * Each strategy knows how to convert a selector value into
  * a Playwright-compatible selector string.
  */

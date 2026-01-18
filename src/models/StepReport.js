@@ -21,16 +21,16 @@ class StepReport {
    */
   maskSensitiveValue(value) {
     if (!value) return value;
-    
+
     const valueStr = String(value);
     // Mask if it looks like a password or contains sensitive keywords
     const sensitiveKeywords = ['password', 'token', 'secret', 'key', 'credential'];
     const lowerValue = valueStr.toLowerCase();
-    
+
     if (sensitiveKeywords.some(keyword => lowerValue.includes(keyword))) {
       return '****';
     }
-    
+
     return valueStr;
   }
 
@@ -90,7 +90,7 @@ class StepReport {
       executionTimeMs: this.executionTimeMs,
       screenshotPath: this.screenshotPath,
       errorMessage: this.errorMessage,
-      stackTrace: this.stackTrace
+      stackTrace: this.stackTrace,
     };
   }
 }

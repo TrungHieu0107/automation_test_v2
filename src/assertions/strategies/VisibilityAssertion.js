@@ -8,28 +8,26 @@ import Logger from '../../utils/Logger.js';
 class VisibilityAssertion extends AssertionStrategy {
   async execute(page, selector, expected, options = {}) {
     const timeout = options.timeout || 10000;
-    
+
     // Normalize expected to boolean
     const shouldBeVisible = this.normalizeVisibility(expected);
-    
-    Logger.debug(`Visibility assertion: element should be ${shouldBeVisible ? 'visible' : 'hidden'}`);
-    
+
+    Logger.debug(
+      `Visibility assertion: element should be ${shouldBeVisible ? 'visible' : 'hidden'}`
+    );
+
     try {
       if (shouldBeVisible) {
         // Assert element is visible
-        await page.waitForSelector(selector, { 
-          timeout, 
-          state: 'visible' 
+        await page.waitForSelector(selector, {
+          timeout,
+          state: 'visible',
         });
-        
+
         const isVisible = await page.isVisible(selector);
-        
+
         if (isVisible) {
-          return this.createSuccessResult(
-            'visible',
-            'visible',
-            `Element is visible: ${selector}`
-          );
+          return this.createSuccessResult('visible', 'visible', `Element is visible: ${selector}`);
         } else {
           return this.createFailureResult(
             'hidden',
@@ -39,19 +37,15 @@ class VisibilityAssertion extends AssertionStrategy {
         }
       } else {
         // Assert element is hidden
-        await page.waitForSelector(selector, { 
-          timeout, 
-          state: 'hidden' 
+        await page.waitForSelector(selector, {
+          timeout,
+          state: 'hidden',
         });
-        
+
         const isVisible = await page.isVisible(selector);
-        
+
         if (!isVisible) {
-          return this.createSuccessResult(
-            'hidden',
-            'hidden',
-            `Element is hidden: ${selector}`
-          );
+          return this.createSuccessResult('hidden', 'hidden', `Element is hidden: ${selector}`);
         } else {
           return this.createFailureResult(
             'visible',
@@ -64,7 +58,7 @@ class VisibilityAssertion extends AssertionStrategy {
       // Timeout - element did not reach expected state
       const actual = shouldBeVisible ? 'hidden' : 'visible';
       const expected = shouldBeVisible ? 'visible' : 'hidden';
-      
+
       return this.createFailureResult(
         actual,
         expected,
@@ -82,19 +76,19 @@ class VisibilityAssertion extends AssertionStrategy {
     if (typeof value === 'boolean') {
       return value;
     }
-    
+
     const strValue = String(value).toLowerCase().trim();
-    
+
     // Visible values
     if (['true', 'visible', 'shown', 'yes', '1'].includes(strValue)) {
       return true;
     }
-    
-    // Hidden values  
+
+    // Hidden values
     if (['false', 'hidden', 'invisible', 'no', '0'].includes(strValue)) {
       return false;
     }
-    
+
     // Default to checking visibility
     return !!value;
   }

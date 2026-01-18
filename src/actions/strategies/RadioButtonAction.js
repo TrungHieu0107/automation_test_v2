@@ -8,12 +8,12 @@ import Logger from '../../utils/Logger.js';
 class RadioButtonAction extends ActionStrategy {
   async execute(page, selector, value, options = {}) {
     await this.verifyElement(page, selector);
-    
+
     Logger.debug(`Selecting radio button: ${selector}`);
-    
+
     // Radio buttons are selected by clicking them
     await page.check(selector);
-    
+
     // Optional delay for UI updates
     const delay = options.delay || 300;
     await page.waitForTimeout(delay);

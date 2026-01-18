@@ -39,7 +39,7 @@ class ExecutionContextStack {
       Logger.warn('Attempted to pop from empty context stack');
       return null;
     }
-    
+
     const context = this.stack.pop();
     Logger.info(`Context popped: ${context.testName} (depth: ${this.stack.length})`);
     return context;

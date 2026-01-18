@@ -10,7 +10,7 @@ fillData:
 submit:
   - type: click
     selector: '.new-todo'
-  
+
   - type: waitForNavigation
     timeout: 2000
 

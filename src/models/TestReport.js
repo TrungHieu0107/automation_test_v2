@@ -29,11 +29,11 @@ class TestReport {
   complete() {
     this.endTime = new Date();
     this.duration = this.endTime - this.startTime;
-    
+
     // Determine final status based on steps and children
     const hasFailedSteps = this.steps.some(step => step.status === 'FAIL');
     const hasFailedChildren = this.children.some(child => child.status === 'FAIL');
-    
+
     if (hasFailedSteps || hasFailedChildren) {
       this.status = 'FAIL';
     } else if (this.status === 'RUNNING') {
@@ -83,7 +83,7 @@ class TestReport {
     const grouped = {
       FILL: [],
       SUBMIT: [],
-      ASSERT: []
+      ASSERT: [],
     };
 
     this.steps.forEach(step => {
@@ -109,7 +109,7 @@ class TestReport {
       steps: this.steps.map(step => step.toJSON()),
       children: this.children.map(child => child.toJSON()),
       errorMessage: this.errorMessage,
-      stackTrace: this.stackTrace
+      stackTrace: this.stackTrace,
     };
   }
 }

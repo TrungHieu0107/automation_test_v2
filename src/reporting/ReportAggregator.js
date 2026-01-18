@@ -14,16 +14,16 @@ class ReportAggregator {
    */
   aggregate(testReports) {
     Logger.info('Aggregating test execution data...');
-    
+
     const summary = ReportSummary.fromTestReports(testReports, this.config);
-    
+
     const reportData = {
       summary: summary.toJSON(),
       tests: testReports.map(test => test.toJSON()),
       generatedAt: new Date().toISOString(),
-      version: '1.0.0'
+      version: '1.0.0',
     };
-    
+
     Logger.success('Test data aggregated successfully');
     return reportData;
   }
@@ -37,7 +37,7 @@ class ReportAggregator {
       passed: reportData.summary.passed,
       failed: reportData.summary.failed,
       skipped: reportData.summary.skipped,
-      duration: reportData.summary.formattedDuration
+      duration: reportData.summary.formattedDuration,
     };
   }
 }

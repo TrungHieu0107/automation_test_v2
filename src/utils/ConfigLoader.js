@@ -24,22 +24,22 @@ class ConfigLoader {
         type: 'msedge',
         headless: false,
         viewport: {
-          width: 1280,
-          height: 720
-        }
+          width: 1535,
+          height: 1024,
+        },
       },
       report: {
         enabled: true,
         outputDir: 'report/',
         openAfterExecution: true,
-        theme: 'default'
+        theme: 'default',
       },
       screenshots: {
         enabled: true,
         onFailure: true,
         beforeSubmit: true,
-        afterNavigation: true
-      }
+        afterNavigation: true,
+      },
     };
   }
 }

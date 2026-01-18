@@ -1,0 +1,94 @@
+name: Create Denpyo
+description: Create a new denpyo entry with product information
+url: http://172.16.0.171:8086/mdw_corepkgshiire-web/ShiireDenpyoEntry.do
+
+# ACTIONS PHASE - Combines all actions in sequence
+actions:
+  # Fill initial form fields
+  - type: fill
+    selector: '[name="term_tenpo_cd.value"]'
+    value: '0101'
+    capture: true
+
+  - type: fill
+    selector: '[name="term_bunrui1_cd.value"]'
+    value: '0101'
+    capture: true
+
+  - type: fill
+    selector: '[name="term_torihikisaki_cd.value"]'
+    value: '030100'
+    capture: true
+
+  - type: fill
+    selector: '[name="term_denpyo_dt.value"]'
+    value: '20250309'
+    capture: true
+
+  # Select radio button (value=0)
+  - type: click
+    selector: '[name="term_saiban_kb.value"][value="0"]'
+    capture: true
+
+  # Click search button
+  - type: click
+    selector: '[name="search"]'
+    capture: true
+
+  # Wait for search results
+  - type: waitForNavigation
+    timeout: 3000
+
+  # Fill product details (after search)
+  - type: fill
+    selector: '[name="itemrow[0].syohin_cd.value"]'
+    value: '0000002721523'
+    capture: true
+
+  - type: fill
+    selector: '[name="itemrow[0].suryo.value"]'
+    value: '1'
+    capture: true
+
+  - type: fill
+    selector: '[name="genka_kei_check.value"]'
+    value: '100'
+    capture: true
+
+  # Click confirm button
+  - type: click
+    selector: '[name="confirm"]'
+    capture: true
+
+  # Handle first confirmation dialog
+  - type: dialog
+    action: accept
+    capture: true
+
+  # Wait after first dialog
+  - type: waitForNavigation
+    timeout: 30000
+
+  # Handle second confirmation dialog
+  - type: dialog
+    action: accept
+    capture: true
+
+  # Wait after second dialog
+  - type: waitForNavigation
+    timeout: 2000
+
+# ASSERTIONS - Verify success
+assertions:
+  # Check that the meisai area is visible
+  - type: visibility
+    selector: '#meisai_area'
+    expected: visible
+    timeout: 10000
+
+  # Check success message text
+  - type: text
+    selector: 'span#message'
+    expected: '登録処理を行いました。'
+    operator: contains
+    timeout: 5000
