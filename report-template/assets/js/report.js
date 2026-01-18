@@ -208,6 +208,7 @@ function createStepElement(step, index) {
         <img src="${step.screenshotPath}" 
              alt="Screenshot" 
              class="screenshot-thumb"
+             data-caption="Step ${index + 1} - ${actionDisplay}"
              onclick="openScreenshotModal('${step.screenshotPath}', 'Step ${index + 1} - ${actionDisplay}')">
       </div>
     `;
@@ -297,36 +298,85 @@ function formatDuration(ms) {
 /**
  * Initialize screenshot modal
  */
+// Gallery State
+let allScreenshots = [];
+let currentScreenshotIndex = 0;
+
 function initializeModal() {
   const modal = document.getElementById('screenshot-modal');
   const modalClose = document.getElementById('modal-close');
   const overlay = modal.querySelector('.modal-overlay');
+  const prevBtn = document.getElementById('modal-prev');
+  const nextBtn = document.getElementById('modal-next');
 
   const closeModal = () => {
     modal.classList.remove('active');
   };
 
   modalClose.addEventListener('click', closeModal);
-  overlay.addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeModal();
+  });
+
+  // Navigation
+  if (prevBtn)
+    prevBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      navigateModal(-1);
+    });
+  if (nextBtn)
+    nextBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      navigateModal(1);
+    });
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && modal.classList.contains('active')) {
-      closeModal();
-    }
+    if (!modal.classList.contains('active')) return;
+    if (e.key === 'Escape') closeModal();
+    if (e.key === 'ArrowLeft') navigateModal(-1);
+    if (e.key === 'ArrowRight') navigateModal(1);
   });
 }
 
-/**
- * Open screenshot modal
- */
 function openScreenshotModal(imagePath, caption) {
-  const modal = document.getElementById('screenshot-modal');
+  // Populate gallery
+  const thumbs = Array.from(document.querySelectorAll('.screenshot-thumb'));
+  allScreenshots = thumbs.map(img => ({
+    src: img.src,
+    caption: img.getAttribute('data-caption') || caption,
+  }));
+
+  // Find index - generic matching
+  currentScreenshotIndex = allScreenshots.findIndex(s => s.src.indexOf(imagePath) !== -1);
+  if (currentScreenshotIndex === -1) currentScreenshotIndex = 0;
+
+  updateModalContent();
+  document.getElementById('screenshot-modal').classList.add('active');
+}
+
+function navigateModal(direction) {
+  const newIndex = currentScreenshotIndex + direction;
+  if (newIndex >= 0 && newIndex < allScreenshots.length) {
+    currentScreenshotIndex = newIndex;
+    updateModalContent();
+  }
+}
+
+function updateModalContent() {
+  if (allScreenshots.length === 0) return;
+  const data = allScreenshots[currentScreenshotIndex];
   const modalImage = document.getElementById('modal-image');
   const modalCaption = document.getElementById('modal-caption');
 
-  modalImage.src = imagePath;
-  modalCaption.textContent = caption;
-  modal.classList.add('active');
+  modalImage.src = data.src;
+  modalCaption.textContent = data.caption;
+
+  const prev = document.getElementById('modal-prev');
+  const next = document.getElementById('modal-next');
+  if (prev) prev.style.visibility = currentScreenshotIndex === 0 ? 'hidden' : 'visible';
+  if (next)
+    next.style.visibility =
+      currentScreenshotIndex === allScreenshots.length - 1 ? 'hidden' : 'visible';
 }
 
 /**
