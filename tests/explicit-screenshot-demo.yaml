@@ -1,0 +1,26 @@
+name: Explicit Screenshot Demo
+description: Test with explicit capture configured to suppress fallback logic
+url: https://demo.playwright.dev/todomvc/
+
+# At least one step has capture: true
+fillData:
+  - selector: '.new-todo'
+    value: 'Task 1'
+    capture: true  # Explicit capture HERE
+  
+  - selector: '.new-todo'
+    value: 'Task 2'
+    # No capture for this step
+
+submit:
+  - type: click
+    selector: '.new-todo'
+
+assertions:
+  - type: exists
+    selector: '.todoapp'
+
+# Expected behavior:
+# - Screenshot captured only after "Task 1" fill step
+# - NO fallback screenshots around submit
+# Because at least one step has capture: true

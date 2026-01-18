@@ -1,0 +1,50 @@
+name: Sample Test Suite
+url: https://example.com
+
+fillData:
+  - selector: '#username'
+    value: 'testuser'
+  - selector: '#password'
+    value: 'testpass123'
+
+submit:
+  - type: click
+    selector: '#login-button'
+  - type: waitForNavigation
+    timeout: 5000
+
+assertions:
+  - type: urlContains
+    expectedUrl: 'dashboard'
+    timeout: 5000
+  - type: exists
+    selector: '.welcome-message'
+    timeout: 3000
+
+children:
+  - name: Child Test 1
+    url: https://example.com/page1
+    fillData:
+      - selector: '#field1'
+        value: 'value1'
+    submit:
+      - type: click
+        selector: '#submit1'
+    assertions:
+      - type: exists
+        selector: '.success'
+        timeout: 3000
+
+  - name: Child Test 2
+    url: https://example.com/page2
+    fillData:
+      - selector: '#field2'
+        value: 'value2'
+    submit:
+      - type: click
+        selector: '#submit2'
+    assertions:
+      - type: text
+        selector: '.result'
+        expectedText: 'Success'
+        timeout: 3000

@@ -1,0 +1,42 @@
+name: Demo Login Test
+url: https://demo.playwright.dev/todomvc/
+
+fillData:
+  - selector: '.new-todo'
+    value: 'Buy groceries'
+
+submit:
+  - type: click
+    selector: '.new-todo'
+  - type: waitForNavigation
+    timeout: 2000
+
+assertions:
+  - type: exists
+    selector: '.todo-list li'
+    timeout: 5000
+
+children:
+  - name: Add Second Item
+    fillData:
+      - selector: '.new-todo'
+        value: 'Walk the dog'
+    
+    submit:
+      - type: click
+        selector: '.new-todo'
+    
+    assertions:
+      - type: exists
+        selector: '.todo-list li:nth-child(2)'
+        timeout: 3000
+  
+  - name: Complete First Item
+    submit:
+      - type: click
+        selector: '.todo-list li:first-child .toggle'
+    
+    assertions:
+      - type: exists
+        selector: '.todo-list li.completed'
+        timeout: 3000

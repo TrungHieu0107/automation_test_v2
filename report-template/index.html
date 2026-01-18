@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Execution Report</title>
+  <link rel="stylesheet" href="assets/css/report.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <h1 class="header-title">
+          <span class="icon">📊</span>
+          Test Execution Report
+        </h1>
+        <div class="header-meta" id="header-meta"></div>
+      </div>
+    </header>
+
+    <!-- Summary Dashboard -->
+    <section class="dashboard" id="dashboard">
+      <div class="dashboard-grid">
+        <div class="stat-card stat-total">
+          <div class="stat-icon">📝</div>
+          <div class="stat-content">
+            <div class="stat-label">Total Tests</div>
+            <div class="stat-value" id="stat-total">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card stat-passed">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <div class="stat-label">Passed</div>
+            <div class="stat-value" id="stat-passed">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card stat-failed">
+          <div class="stat-icon">❌</div>
+          <div class="stat-content">
+            <div class="stat-label">Failed</div>
+            <div class="stat-value" id="stat-failed">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card stat-skipped">
+          <div class="stat-icon">⏸</div>
+          <div class="stat-content">
+            <div class="stat-label">Skipped</div>
+            <div class="stat-value" id="stat-skipped">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card stat-duration">
+          <div class="stat-icon">⏱</div>
+          <div class="stat-content">
+            <div class="stat-label">Duration</div>
+            <div class="stat-value" id="stat-duration">0s</div>
+          </div>
+        </div>
+
+        <div class="stat-card stat-browser">
+          <div class="stat-icon">🌐</div>
+          <div class="stat-content">
+            <div class="stat-label">Browser</div>
+            <div class="stat-value" id="stat-browser">N/A</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test Results -->
+    <section class="results-section">
+      <h2 class="section-title">Test Results</h2>
+      <div id="test-tree" class="test-tree"></div>
+    </section>
+  </div>
+
+  <!-- Screenshot Modal -->
+  <div id="screenshot-modal" class="modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close">&times;</button>
+      <img id="modal-image" src="" alt="Screenshot">
+      <div class="modal-caption" id="modal-caption"></div>
+    </div>
+  </div>
+
+  <script src="assets/js/report.js"></script>
+</body>
+</html>

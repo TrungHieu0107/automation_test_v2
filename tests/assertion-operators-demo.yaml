@@ -1,0 +1,50 @@
+name: Assertion Operators Demo
+description: Test demonstrating all assertion types and operators
+url: https://demo.playwright.dev/todomvc/
+
+fillData:
+  - selector: '.new-todo'
+    value: 'Learn Playwright Testing Framework'
+
+submit:
+  - type: click
+    selector: '.new-todo'
+  
+  - type: waitForNavigation
+    timeout: 2000
+
+assertions:
+  # TextContent assertions with different operators
+  - type: textContent
+    selector: '.todo-list li label'
+    expected: 'Learn Playwright Testing Framework'
+    operator: equals
+  
+  - type: textContent
+    selector: '.todo-list li label'
+    expected: 'Playwright'
+    operator: contains
+  
+  - type: textContent
+    selector: '.todo-list li label'
+    expected: '^Learn.*Framework$'
+    operator: regex
+  
+  # Visibility assertion
+  - type: visibility
+    selector: '.todo-list'
+    expected: visible
+  
+  # InputValue assertion
+  - type: inputValue
+    selector: '.new-todo'
+    expected: ''
+    operator: equals
+  
+  # Legacy assertions (backward compatibility)
+  - type: exists
+    selector: '.todoapp'
+  
+  - type: text
+    selector: '.todoapp h1'
+    expectedText: 'todos'

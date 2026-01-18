@@ -1,0 +1,26 @@
+browser:
+  type: msedge
+  headless: false
+  viewport:
+    width: 1280
+    height: 720
+
+report:
+  enabled: true
+  outputDir: report/
+  openAfterExecution: true
+  theme: default
+
+screenshots:
+  enabled: true
+  onFailure: true
+  # Per-step screenshot control via 'capture: true' in YAML tests
+  # Fallback: Auto-capture before/after submit if no explicit captures
+
+testExecution:
+  stopOnChildFailure: false      # Continue with next child even if one fails
+  restoreBrowserState: true      # Navigate back to parent URL after each child
+
+childTests:
+  validatePaths: true             # Validate child file paths before execution
+  detectCircularRefs: true        # Detect circular dependencies

@@ -1,0 +1,306 @@
+# Automation Test v2
+
+Professional# YAML-Driven Web Automation Framework
+
+Professional test execution framework with enterprise-grade HTML reporting.
+
+## Features
+
+- ✅ **YAML-Driven Tests** - Define tests using simple YAML syntax
+- ✅ **File-Based Test Composition** - Modular test organization with parent-child file references
+- ✅ **Flexible Selectors** - Support for id, name, css, xpath selector strategies
+- ✅ **Multi-Element Support** - input, textarea, select, checkbox, radio buttons
+- ✅ **Rich Assertions** - textContent, inputValue, visibility, enabled, style with operators
+- ✅ **Per-Step Screenshots** - Fine-grained control with automatic fallback
+- ✅ **Professional HTML Reports** - Modern UI with glassmorphism and dark theme
+- ✅ **Browser State Preservation** - No restarts between parent and child tests
+- ✅ **Hierarchical Test Visualization** - Clear parent→child relationships in reports
+- ✅ **Multiple Browser Support** - Edge, Chrome, Firefox, Safari (via Playwright)
+- ✅ **Configurable Execution** - Control failure behavior and state restoration
+- ✅ **Circular Dependency Detection** - Prevents infinite test loops
+- ✅ **SOLID Principles** - Extensible architecture with Strategy and Factory patterns
+
+## Installation
+
+```bash
+npm install
+```
+
+## Usage
+
+### Run Tests
+
+```bash
+# Run test with default browser
+npm test
+
+# Run specific test file
+node index.js tests/your-test.yaml
+```
+
+### Test Structure
+
+#### Parent Test (referencing child files)
+
+```yaml
+name: Login Test  
+url: https://example.com
+
+fillData:
+  - selector: '#username'
+    value: 'admin'
+
+submit:
+  - type: click
+    selector: '#loginBtn'
+
+assertions:
+  - type: exists
+    selector: '.dashboard'
+
+children:
+  - path: children/update-profile.yaml
+  - path: children/logout.yaml
+```
+
+#### Child Test (reuses parent browser state)
+
+```yaml
+name: Update Profile
+
+fillData:
+  # New selector format with explicit strategy
+  - selector:
+      by: name
+      value: 'profileName'
+    value: 'John Doe'
+    capture: true  # Optional: capture screenshot after this step
+  
+  # Legacy format still supported
+  - selector: '#email'
+    value: 'john@example.com'
+
+submit:
+  - type: click
+    selector: '#saveBtn'
+
+assertions:
+  # Rich assertions with operators
+  - type: textContent
+    selector: '.success'
+    expected: 'Profile updated'
+    operator: contains
+  
+  # Visibility assertion
+  - type: visibility
+    selector: '.success'
+    expected: visible
+```
+
+## Configuration
+
+Edit `config.yaml` to customize:
+
+```yaml
+browser:
+  type: msedge          # msedge, chrome, firefox, webkit
+  headless: false       # Show browser window
+
+report:
+  enabled: true
+  outputDir: report/
+  openAfterExecution: true
+
+screenshots:
+  enabled: true
+  onFailure: true
+  # Per-step control via YAML (capture: true)
+  # Automatic fallback before/after submit if no explicit captures
+
+testExecution:
+  stopOnChildFailure: false    # Continue with next child if one fails
+  restoreBrowserState: true    # Navigate back to parent URL after each child
+```
+
+## Advanced Features
+
+### Selector Strategies
+
+Support for multiple selector types:
+
+```yaml
+fillData:
+  # ID selector
+  - selector:
+      by: id
+      value: 'username'
+    value: 'admin'
+  
+  # Name selector
+  - selector:
+      by: name
+      value: 'email'
+    value: 'user@example.com'
+  
+  # CSS selector (default)
+  - selector:
+      by: css
+      value: '.login-form input[type="submit"]'
+    value: 'Login'
+  
+  # XPath selector
+  - selector:
+      by: xpath
+      value: '//input[@type="password"]'
+    value: 'secret123'
+```
+
+### Element Type Support
+
+Framework auto-detects element types:
+- **Input fields**: text, email, password, etc.
+- **Textarea**: multi-line text input
+- **Select dropdowns**: Select by value, label, or index
+- **Checkboxes**: check/uncheck
+- **Radio buttons**: selection
+
+```yaml
+fillData:
+  # Select dropdown by value
+  - selector: '#country'
+    value: 'USA'
+    options:
+      selectBy: value  # or 'label' or 'index'
+  
+  # Checkbox
+  - selector: '#terms'
+    value: true  # or 'checked', 'yes', '1'
+    action: checkbox
+```
+
+### Rich Assertions
+
+Multiple assertion types with operators:
+
+```yaml
+assertions:
+  # Text content with operators
+  - type: textContent
+    selector: '.message'
+    expected: 'Success'
+    operator: equals  # or 'contains' or 'regex'
+  
+  # Input value assertion
+  - type: inputValue
+    selector: '#username'
+    expected: 'admin'
+    operator: equals
+  
+  # Visibility assertion
+  - type: visibility
+    selector: '.error'
+    expected: hidden  # or 'visible'
+  
+  # Enabled/disabled state
+  - type: enabled
+    selector: '#submitBtn'
+    expected: enabled  # or 'disabled'
+  
+  # CSS style assertion
+  - type: style
+    selector: '.success'
+    property: color
+    expected: 'rgb(0, 128, 0)'
+```
+
+### Screenshot Configuration
+
+Per-step control with automatic fallback:
+
+```yaml
+fillData:
+  # Explicit capture
+  - selector: '#username'
+    value: 'admin'
+    capture: true  # Screenshot taken after this step
+  
+  # No capture
+  - selector: '#password'
+    value: 'secret'
+    # No capture property - no screenshot
+```
+
+**Fallback Behavior**:
+- If **no step** has `capture: true`, framework automatically:
+  - Captures screenshot **before submit**
+  - Captures screenshot **after submit**
+- If **any step** has `capture: true`, no fallback screenshots
+
+## Report Features
+
+The HTML report includes:
+- **Dashboard** with test statistics and execution time
+- **Test Hierarchy Tree** showing parent-child relationships
+- **Step-by-Step Details** with screenshots and timing
+- **Assertion Results** with expected vs actual comparisons
+- **Error Tracking** with collapsible stack traces
+- **Screenshot Modal** for full-size previews
+
+## File-Based Test Composition
+
+### Benefits
+
+- 🔹 **Modularity** - Each test is a separate, reusable file
+- 🔹 **Maintainability** - Easier to update and version control
+- 🔹 **Scalability** - Large test suites remain organized
+- 🔹 **Reusability** - Child tests can be used by multiple parents
+- 🔹 **Performance** - No browser restarts, faster execution
+
+### Path Resolution
+
+Child paths are resolved relative to the parent test file:
+
+```
+tests/
+├── parent-test.yaml          # References: children/test1.yaml
+├── children/
+│   ├── test1.yaml  
+│   └── test2.yaml
+└── shared/
+    └── common-test.yaml      # Reusable test
+```
+
+### Browser State Preservation
+
+When running parent→child tests:
+- Browser session persists (cookies, localStorage, sessionStorage)
+- No page refresh between tests
+- Child starts from parent's final URL
+- Optional: restore parent URL between children (configurable)
+
+## Architecture
+
+```
+src/
+├── core/
+│   ├── TestExecutor.js           # Main test orchestrator
+│   ├── TestFileLoader.js         # YAML file loading with circular detection
+│   ├── TestOrchestrator.js       # Parent-child execution flow
+│   └── ExecutionContextStack.js  # Browser state management
+├── models/
+│   ├── TestReport.js             # Test execution data
+│   └── StepReport.js             # Step-level details
+├── actions/
+│   ├── ActionHandler.js          # Browser actions
+│   └── ScreenshotManager.js      # Screenshot capture
+├── assertions/
+│   └── AssertionEngine.js        # Assertion validation
+└── reporting/
+    ├── ReportManager.js          # Report coordination
+    ├── ReportAggregator.js       # Data aggregation
+    └── HtmlReportGenerator.js    # HTML generation
+```
+
+## License
+
+MIT

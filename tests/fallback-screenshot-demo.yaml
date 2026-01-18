@@ -1,0 +1,24 @@
+name: Fallback Screenshot Demo
+description: Test with NO explicit captures to demonstrate fallback logic
+url: https://demo.playwright.dev/todomvc/
+
+# All fillData steps have capture: false or not specified
+fillData:
+  - selector: '.new-todo'
+    value: 'Task without screenshots'
+
+submit:
+  - type: click
+    selector: '.new-todo'
+  
+  - type: waitForNavigation
+    timeout: 2000
+
+assertions:
+  - type: exists
+    selector: '.todoapp'
+
+# Expected behavior:
+# - Fallback screenshot captured BEFORE submit
+# - Fallback screenshot captured AFTER submit
+# Because no step has capture: true

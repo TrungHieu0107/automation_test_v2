@@ -1,0 +1,61 @@
+name: Enhanced Features Demo Test
+description: Comprehensive test showcasing all new framework features
+url: https://demo.playwright.dev/todomvc/
+
+# FILL DATA PHASE - Demonstrates multiple selector types and element types
+fillData:
+  # Legacy format (still supported)
+  - selector: '.new-todo'
+    value: 'Task 1: Learn selectors'
+  
+  # New format: ID selector
+  - selector:
+      by: id
+      value: new-todo
+    value: 'Task 2: Master assertions'
+    capture: true  # Explicit screenshot capture after this step
+  
+  # New format: Name selector
+  - selector:
+      by: name
+      value: task-input
+    value: 'Task 3: Use strategies'
+
+# SUBMIT PHASE
+submit:
+  - type: click
+    selector: '.new-todo'
+  
+  - type: waitForNavigation
+    timeout: 2000
+
+# ASSERTIONS PHASE - Demonstrates rich assertion capabilities
+assertions:
+  # New format: TextContent with operators
+  - type: textContent
+    selector: '.todoapp h1'
+    expected: 'todos'
+    operator: equals
+    timeout: 5000
+  
+  # TextContent with contains operator
+  - type: textContent
+    selector: '.todo-list'
+    expected: 'Learn selectors'
+    operator: contains
+  
+  # Visibility assertion
+  - type: visibility
+    selector: '.todo-list'
+    expected: visible
+  
+  # InputValue assertion (checking placeholder or value)
+  - type: inputValue
+    selector: '.new-todo'
+    expected: ''
+    operator: equals
+  
+  # Legacy format (still supported)
+  - type: exists
+    selector: '.todoapp'
+    timeout: 3000

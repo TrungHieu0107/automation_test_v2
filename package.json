@@ -1,0 +1,19 @@
+{
+  "name": "automation-test-v2",
+  "version": "1.0.0",
+  "description": "YAML-driven automation testing framework with professional HTML reporting",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node index.js",
+    "start": "node index.js"
+  },
+  "keywords": ["automation", "testing", "playwright", "reporting", "yaml"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "playwright": "^1.40.0",
+    "js-yaml": "^4.1.0",
+    "fs-extra": "^11.2.0"
+  }
+}

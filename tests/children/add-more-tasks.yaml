@@ -1,0 +1,15 @@
+name: Add More Tasks
+description: Child test that adds additional tasks to the list
+
+fillData:
+  - selector: '.new-todo'
+    value: 'Buy groceries'
+
+submit:
+  - type: click
+    selector: '.new-todo'
+
+assertions:
+  - type: exists
+    selector: '.todo-list li:nth-child(2)'
+    timeout: 3000

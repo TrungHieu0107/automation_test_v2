@@ -1,0 +1,22 @@
+name: Login and Dashboard Test
+description: Parent test that logs in and navigates to dashboard
+url: https://demo.playwright.dev/todomvc/
+
+fillData:
+  - selector: '.new-todo'
+    value: 'Setup initial task'
+
+submit:
+  - type: click
+    selector: '.new-todo'
+  - type: waitForNavigation
+    timeout: 2000
+
+assertions:
+  - type: exists
+    selector: '.todoapp'
+    timeout: 3000
+
+children:
+  - path: children/add-more-tasks.yaml
+  - path: children/mark-task-complete.yaml
