@@ -3,6 +3,7 @@ import fs from 'fs-extra';
 import yaml from 'js-yaml';
 import Logger from '../utils/Logger.js';
 import TestReport from '../models/TestReport.js';
+import StepReport from '../models/StepReport.js';
 import ActionHandler from '../actions/ActionHandler.js';
 import ScreenshotManager from '../actions/ScreenshotManager.js';
 import AssertionEngine from '../assertions/AssertionEngine.js';
@@ -126,6 +127,8 @@ class TestExecutor {
     const outputDir = this.reportManager.getOutputDir();
     const screenshotManager = new ScreenshotManager(outputDir, this.config);
     const actionHandler = new ActionHandler(this.page, screenshotManager);
+    actionHandler.resetDialogQueue();
+    actionHandler.startDialogListener();
     const assertionEngine = new AssertionEngine(this.page, screenshotManager);
 
     // Reset screenshot capture tracking for this test
@@ -149,55 +152,76 @@ class TestExecutor {
       if (testData.actions) {
         Logger.info('\n--- ACTIONS PHASE ---');
 
-        for (const action of testData.actions) {
+        // Use standard for-loop to allow look-ahead/skipping
+        for (let i = 0; i < testData.actions.length; i++) {
+          const action = testData.actions[i];
+          const currentStepIndex = stepIndex; // Current base index
+
+          // LOOK-ACTION: Dialog Handling
+          // Check if upcoming actions are dialogs. If so, we must register handlers
+          // BEFORE executing the current action (which likely triggers the dialog).
+          const dialogSteps = [];
+          let skipCount = 0;
+
+          if (action.type !== 'dialog') {
+            let j = i + 1;
+            while (j < testData.actions.length && testData.actions[j].type === 'dialog') {
+              const dialogAction = testData.actions[j];
+              const dialogIndex = currentStepIndex + 1 + (j - (i + 1)); // current + 1 + offset
+
+              // Register handler immediately
+              const dStep = await actionHandler.handleDialog(
+                dialogAction.action,
+                testData.name,
+                dialogIndex,
+                dialogAction.capture
+              );
+
+              dialogSteps.push(dStep);
+              skipCount++;
+              j++;
+            }
+          }
+
           let step;
-
-          // Determine action type
           const actionType = action.type || 'fill';
+          const capture = action.capture || false;
 
+          // EXECUTE CURRENT ACTION
           if (actionType === 'fill') {
-            // Fill input field
             step = await actionHandler.fillInput(
               action.selector,
               action.value,
               testData.name,
-              stepIndex++,
-              action.capture || false
+              currentStepIndex
             );
           } else if (actionType === 'click') {
-            // Click element
             step = await actionHandler.click(
               action.selector,
               testData.name,
-              stepIndex++,
-              'ACTION',
-              action.capture || false
+              currentStepIndex,
+              'ACTION'
             );
           } else if (actionType === 'dialog') {
-            // Handle dialog
-            step = await actionHandler.handleDialog(
-              action.action,
-              testData.name,
-              stepIndex++,
-              action.capture || false
-            );
+            // Standard dialog execution (stand-alone)
+            step = await actionHandler.handleDialog(action.action, testData.name, currentStepIndex);
           } else if (actionType === 'waitForNavigation') {
-            // Wait for navigation
             step = await actionHandler.waitForNavigation(
               testData.name,
-              stepIndex++,
+              currentStepIndex,
               action.timeout
             );
           } else {
             throw new Error(`Unsupported action type: ${actionType}`);
           }
 
+          // Capture for current action
           if (capture) {
             const screenshot = await screenshotManager.capture(
               this.page,
-              testName,
+              testData.name,
               actionType,
-              stepIndex
+              currentStepIndex
             );
             if (screenshot) {
               step.attachScreenshot(screenshot);
@@ -206,9 +230,18 @@ class TestExecutor {
 
           testReport.addStep(step);
 
+          // Add pre-registered dialog steps to report
+          for (const dStep of dialogSteps) {
+            testReport.addStep(dStep);
+          }
+
           if (step.status === 'FAIL') {
             throw new Error(`Action failed: ${actionType} at ${action.selector || 'dialog'}`);
           }
+
+          // Advance index and loop counter
+          stepIndex += 1 + skipCount;
+          i += skipCount;
         }
       }
 
@@ -230,58 +263,26 @@ class TestExecutor {
         }
       }
 
-      // Execute submit phase
-      if (testData.submit) {
-        Logger.info('\n--- SUBMIT PHASE ---');
-
-        // Capture fallback screenshot before submit if no explicit captures
-        const beforeSubmitScreenshot = await screenshotManager.captureFallbackBeforeSubmit(
-          this.page,
-          testData.name,
-          stepIndex
-        );
-
-        for (const action of testData.submit) {
-          if (action.type === 'click') {
-            const step = await actionHandler.click(
-              action.selector,
-              testData.name,
-              stepIndex++,
-              'SUBMIT'
-            );
-            testReport.addStep(step);
-
-            if (step.status === 'FAIL') {
-              throw new Error(`Submit failed at ${action.selector}`);
-            }
-          } else if (action.type === 'dialog') {
-            const step = await actionHandler.handleDialog(
-              action.action,
-              testData.name,
-              stepIndex++,
-              action.capture || false
-            );
-            testReport.addStep(step);
-          } else if (action.type === 'waitForNavigation') {
-            const step = await actionHandler.waitForNavigation(
-              testData.name,
-              stepIndex++,
-              action.timeout
-            );
-            testReport.addStep(step);
-          }
-        }
-
-        // Capture fallback screenshot after submit if no explicit captures
-        const afterSubmitScreenshot = await screenshotManager.captureFallbackAfterSubmit(
-          this.page,
-          testData.name,
-          stepIndex
-        );
-      }
-
       // Execute assertions
       if (testData.assertions) {
+        // Capture screenshot before assertions (User Request)
+        const preAssertStep = new StepReport(
+          'ASSERT',
+          'screenshot',
+          'page',
+          'pre-assertion snapshot'
+        );
+        preAssertStep.start();
+        const s = await screenshotManager.capture(
+          this.page,
+          testData.name,
+          'pre_assertion',
+          stepIndex++
+        );
+        if (s) preAssertStep.attachScreenshot(s);
+        preAssertStep.pass();
+        testReport.addStep(preAssertStep);
+
         Logger.info('\n--- ASSERTION PHASE ---');
         for (const assertion of testData.assertions) {
           let step;

@@ -64,28 +64,6 @@ class ScreenshotManager {
   }
 
   /**
-   * Capture screenshot before submit
-   */
-  async captureBeforeSubmit(page, testName, stepIndex) {
-    if (!this.config.screenshots || !this.config.screenshots.beforeSubmit) {
-      return null;
-    }
-
-    return await this.capture(page, testName, 'BEFORE_SUBMIT', stepIndex);
-  }
-
-  /**
-   * Capture screenshot after navigation
-   */
-  async captureAfterNavigation(page, testName, stepIndex) {
-    if (!this.config.screenshots || !this.config.screenshots.afterNavigation) {
-      return null;
-    }
-
-    return await this.capture(page, testName, 'AFTER_NAVIGATION', stepIndex);
-  }
-
-  /**
    * Mark that a step has explicit capture configured
    * Called by ActionExecutor when capture: true is found
    */

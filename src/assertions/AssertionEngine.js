@@ -27,34 +27,51 @@ class AssertionEngine {
     try {
       Logger.step(`Asserting text at ${selector}: "${expectedText}" (${operator})`);
 
-      // Wait for element to be attached to DOM (not necessarily visible)
-      // This allows reading text from hidden elements (display:none)
+      // 1. Wait for element to be attached first
       await this.page.waitForSelector(selector, { timeout, state: 'attached' });
 
-      // Get actual text using textContent() - works for ALL HTML elements
-      // (span, div, p, h1-h6, td, li, button, label, etc.)
-      const element = await this.page.$(selector);
-      const actualText = await element.textContent();
-
-      // Perform comparison based on operator
+      // 2. Poll for text match until timeout
+      const startTime = Date.now();
+      let actualText = '';
       let passed = false;
-      const trimmedActual = actualText.trim();
-      const trimmedExpected = expectedText.trim();
+      const trimExpected = expectedText.trim();
 
-      switch (operator) {
-        case 'equals':
-          passed = trimmedActual === trimmedExpected;
-          break;
-        case 'contains':
-          passed = trimmedActual.includes(trimmedExpected);
-          break;
-        case 'regex':
-          const regex = new RegExp(trimmedExpected);
-          passed = regex.test(trimmedActual);
-          break;
-        default:
-          passed = trimmedActual === trimmedExpected;
+      while (Date.now() - startTime < timeout) {
+        // Get current text
+        const element = await this.page.$(selector);
+        // Handle case where element might briefly detach
+        if (!element) {
+          await this.page.waitForTimeout(100);
+          continue;
+        }
+
+        actualText = (await element.textContent()) || '';
+        const trimActual = actualText.trim();
+
+        // Check match
+        switch (operator) {
+          case 'equals':
+            passed = trimActual === trimExpected;
+            break;
+          case 'contains':
+            passed = trimActual.includes(trimExpected);
+            break;
+          case 'regex':
+            const regex = new RegExp(trimExpected);
+            passed = regex.test(trimActual);
+            break;
+          default:
+            passed = trimActual === trimExpected;
+        }
+
+        if (passed) break;
+
+        // Wait before retry
+        await this.page.waitForTimeout(100);
       }
+
+      const trimmedActual = actualText.trim();
+      const trimmedExpected = trimExpected;
 
       if (passed) {
         Logger.success(`✓ Assertion passed: "${trimmedActual}"`);
@@ -62,7 +79,7 @@ class AssertionEngine {
         step.value = `actual: ${trimmedActual}`;
       } else {
         const error = new Error(
-          `Assertion failed: Expected ${operator} "${trimmedExpected}", but got "${trimmedActual}"`
+          `Assertion failed: Expected ${operator} "${trimmedExpected}", but got "${trimmedActual}" (after ${timeout}ms)`
         );
         Logger.error(error.message);
         step.fail(error);
