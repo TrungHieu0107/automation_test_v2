@@ -64,11 +64,13 @@ actions:
   - type: dialog
     action: accept
     capture: true
+    captureDelayMs: 30000
 
   # Handle second confirmation dialog
   - type: dialog
     action: accept
     capture: true
+    captureDelayMs: 10000
 
 # ASSERTIONS - Verify success
 assertions:

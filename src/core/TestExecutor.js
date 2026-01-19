@@ -50,7 +50,10 @@ class TestExecutor {
       browserEngine = chromium;
     }
 
-    // Launch browser
+    // Get viewport dimensions
+    const viewport = this.config.browser?.viewport || { width: 1535, height: 1024 };
+
+    // Launch browser (normal mode)
     this.browser = await browserEngine.launch({
       headless,
       channel: browserType === 'msedge' ? 'msedge' : undefined,
@@ -58,13 +61,45 @@ class TestExecutor {
 
     // Create context
     this.context = await this.browser.newContext({
-      viewport: this.config.browser?.viewport || { width: 1535, height: 1024 },
+      viewport: viewport,
     });
 
-    // Create page
-    this.page = await this.context.newPage();
+    // Note: page will be created later (either as popup or normal page)
 
     Logger.success('Browser initialized');
+  }
+
+  /**
+   * Open URL as popup window using window.open()
+   * @param {string} url - URL to open
+   * @returns {Promise<Page>} Popup page
+   */
+  async openUrlAsPopup(url) {
+    Logger.info(`Opening URL as popup: ${url}`);
+
+    // Create blank initial page
+    const blankPage = await this.context.newPage();
+
+    // Open URL as popup using window.open()
+    const [popup] = await Promise.all([
+      this.context.waitForEvent('page'), // Wait for popup event
+      blankPage.evaluate(targetUrl => {
+        window.open(targetUrl, '_blank', 'popup=yes,width=1535,height=1024');
+      }, url),
+    ]);
+
+    // Wait for popup to load
+    await popup.waitForLoadState('networkidle');
+
+    // Bring popup to front (make it active window)
+    await popup.bringToFront();
+
+    // Close blank page (no longer needed)
+    await blankPage.close();
+
+    Logger.info('Popup window opened and focused');
+
+    return popup;
   }
 
   /**
@@ -137,8 +172,8 @@ class TestExecutor {
     try {
       let stepIndex = 0;
 
-      // Navigate to URL if specified (only for parent tests)
-      if (testData.url) {
+      // Navigate to URL if specified and not already opened as popup
+      if (testData.url && !testData._popupOpened) {
         const navStep = await actionHandler.navigate(testData.url, testData.name, stepIndex++);
         testReport.addStep(navStep);
 
@@ -354,9 +389,20 @@ class TestExecutor {
    */
   async run(testFilePath) {
     try {
+      // Initialize browser and context
       await this.initialize();
 
+      // Load test to check if it has URL
       const testData = await this.loadTest(testFilePath);
+
+      // If test has URL, open as popup
+      if (testData.url) {
+        this.page = await this.openUrlAsPopup(testData.url);
+        testData._popupOpened = true; // Flag to skip navigation later
+      } else {
+        // No URL - create normal page
+        this.page = await this.context.newPage();
+      }
 
       // Execute test (can be parent with children)
       await this.executeTest(testData);

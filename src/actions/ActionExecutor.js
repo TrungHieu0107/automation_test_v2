@@ -51,11 +51,15 @@ class ActionExecutor {
         Logger.debug(`Capturing screenshot (explicit capture=true)`);
         this.screenshotManager.markExplicitCapture();
 
+        // Extract optional screenshot delay
+        const captureDelayMs = stepConfig.captureDelayMs || 0;
+
         const screenshot = await this.screenshotManager.capture(
           this.page,
           testName,
           phase,
-          stepIndex
+          stepIndex,
+          captureDelayMs
         );
 
         if (screenshot) {

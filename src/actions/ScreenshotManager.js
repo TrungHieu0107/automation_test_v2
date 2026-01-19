@@ -58,8 +58,9 @@ class ScreenshotManager {
   /**
    * Capture screenshot using screenshot_agent.exe
    * Single source of truth for all screenshot captures
+   * @param {number} delayMs - Optional delay in milliseconds before capturing (default: 100ms)
    */
-  async capture(page, testName, phase, stepIndex) {
+  async capture(page, testName, phase, stepIndex, delayMs = 0) {
     if (!this.config.screenshots || !this.config.screenshots.enabled) {
       return null;
     }
@@ -74,13 +75,14 @@ class ScreenshotManager {
       // Bring browser window to front to ensure it's the active window
       await page.bringToFront();
 
-      // Small delay to ensure window is active
-      await page.waitForTimeout(100);
+      // Apply custom delay if specified, otherwise use default 100ms
+      const waitTime = delayMs > 0 ? delayMs : 100;
+      await page.waitForTimeout(waitTime);
 
       // Execute screenshot_agent.exe to capture active window
       await this.executeScreenshotAgent(filepath);
 
-      Logger.debug(`Screenshot captured: ${filename}`);
+      Logger.debug(`Screenshot captured: ${filename} (delay: ${waitTime}ms)`);
 
       // Return relative path for HTML report
       return `screenshots/${filename}`;
@@ -93,13 +95,14 @@ class ScreenshotManager {
 
   /**
    * Capture screenshot on failure
+   * @param {number} delayMs - Optional delay in milliseconds before capturing
    */
-  async captureOnFailure(page, testName, stepIndex) {
+  async captureOnFailure(page, testName, stepIndex, delayMs = 0) {
     if (!this.config.screenshots || !this.config.screenshots.onFailure) {
       return null;
     }
 
-    return await this.capture(page, testName, 'FAILURE', stepIndex);
+    return await this.capture(page, testName, 'FAILURE', stepIndex, delayMs);
   }
 
   /**
@@ -128,15 +131,16 @@ class ScreenshotManager {
   /**
    * Capture fallback screenshot before submit
    * Only captures if no explicit captures have been configured
+   * @param {number} delayMs - Optional delay in milliseconds before capturing
    */
-  async captureFallbackBeforeSubmit(page, testName, stepIndex) {
+  async captureFallbackBeforeSubmit(page, testName, stepIndex, delayMs = 0) {
     if (!this.config.screenshots || !this.config.screenshots.enabled) {
       return null;
     }
 
     if (this.shouldCaptureFallback()) {
       Logger.debug('Fallback: capturing before submit (no explicit captures)');
-      return await this.capture(page, testName, 'FALLBACK_BEFORE_SUBMIT', stepIndex);
+      return await this.capture(page, testName, 'FALLBACK_BEFORE_SUBMIT', stepIndex, delayMs);
     }
 
     return null;
@@ -145,15 +149,16 @@ class ScreenshotManager {
   /**
    * Capture fallback screenshot after submit/navigation
    * Only captures if no explicit captures have been configured
+   * @param {number} delayMs - Optional delay in milliseconds before capturing
    */
-  async captureFallbackAfterSubmit(page, testName, stepIndex) {
+  async captureFallbackAfterSubmit(page, testName, stepIndex, delayMs = 0) {
     if (!this.config.screenshots || !this.config.screenshots.enabled) {
       return null;
     }
 
     if (this.shouldCaptureFallback()) {
       Logger.debug('Fallback: capturing after submit (no explicit captures)');
-      return await this.capture(page, testName, 'FALLBACK_AFTER_SUBMIT', stepIndex);
+      return await this.capture(page, testName, 'FALLBACK_AFTER_SUBMIT', stepIndex, delayMs);
     }
 
     return null;
