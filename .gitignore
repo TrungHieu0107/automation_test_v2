@@ -3,3 +3,4 @@ report/
 *.log
 .DS_Store
 .env
+build/
