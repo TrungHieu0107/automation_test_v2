@@ -1,6 +1,9 @@
 import path from 'path';
 import fs from 'fs-extra';
 import Logger from '../utils/Logger.js';
+import { execFile } from 'child_process';
+import path from 'path';
+import fs from 'fs';
 
 /**
  * Screenshot capture and management
@@ -118,6 +121,31 @@ class ScreenshotManager {
     }
 
     return null;
+  }
+
+  /**
+   * Ch?p m?n h?nh c?a s? ?ang active (OS-level)
+   * @param {string} outputPath - ???ng d?n tuy?t ??i t?i file ?nh
+   */
+  captureWindow(outputPath) {
+    return new Promise((resolve, reject) => {
+      const exePath = path.resolve(process.cwd(), 'bin', 'screenshot_agent.exe');
+
+      if (!fs.existsSync(exePath)) {
+        return reject(new Error(`screenshot_agent.exe not found at ${exePath}`));
+      }
+
+      // ??m b?o folder t?n t?i
+      fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+
+      execFile(exePath, [outputPath], { windowsHide: true }, err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
   }
 }
 
