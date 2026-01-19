@@ -14,6 +14,7 @@ report:
 screenshots:
   enabled: true
   onFailure: true
+  # All screenshots captured via screenshot_agent.exe (OS-level active window capture)
   # Per-step screenshot control via 'capture: true' in YAML tests
   # Fallback: Auto-capture before/after submit if no explicit captures
 
@@ -24,3 +25,13 @@ testExecution:
 childTests:
   validatePaths: true # Validate child file paths before execution
   detectCircularRefs: true # Detect circular dependencies
+
+popupScreenshot:
+  enabled: true
+  screenshotAgentPath: ./screenshot_agent.exe
+  outputDir: screenshots/popup/
+  waitAfterLoad: 5000 # ms to wait after page load before screenshot
+  closeAfterCapture: true
+  windowDimensions:
+    width: 1534
+    height: 1024

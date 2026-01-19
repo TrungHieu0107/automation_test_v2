@@ -1,5 +1,6 @@
 import ConfigLoader from './src/utils/ConfigLoader.js';
 import TestExecutor from './src/core/TestExecutor.js';
+import PopupScreenshotCapture from './src/utils/PopupScreenshotCapture.js';
 import Logger from './src/utils/Logger.js';
 
 /**
@@ -15,16 +16,28 @@ async function main() {
     // Load configuration
     const config = ConfigLoader.load('./config.yaml');
 
-    // Create test executor
-    const executor = new TestExecutor(config);
+    // Check for popup screenshot mode
+    const isPopupMode = process.argv.includes('--popup');
+    const testFile = process.argv.find(arg => arg.endsWith('.yaml')) || './tests/sample-test.yaml';
 
-    // Run tests
-    const testFile = process.argv[2] || './tests/sample-test.yaml';
-    Logger.info(`Running test file: ${testFile}`);
+    if (isPopupMode) {
+      Logger.info('🖼️  POPUP SCREENSHOT MODE');
+      Logger.info(`Test file: ${testFile}`);
 
-    await executor.run(testFile);
+      const popupCapture = new PopupScreenshotCapture(config);
+      await popupCapture.captureFromTestFile(testFile);
 
-    Logger.success('\n✓ Test execution completed successfully!');
+      Logger.success('\n✓ Popup screenshot captured successfully!');
+    } else {
+      // Normal test execution
+      const executor = new TestExecutor(config);
+      Logger.info(`Running test file: ${testFile}`);
+
+      await executor.run(testFile);
+
+      Logger.success('\n✓ Test execution completed successfully!');
+    }
+
     process.exit(0);
   } catch (error) {
     Logger.error(`\n✗ Execution failed: ${error.message}`);

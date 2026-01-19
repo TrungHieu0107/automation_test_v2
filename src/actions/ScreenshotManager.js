@@ -2,11 +2,10 @@ import path from 'path';
 import fs from 'fs-extra';
 import Logger from '../utils/Logger.js';
 import { execFile } from 'child_process';
-import path from 'path';
-import fs from 'fs';
 
 /**
  * Screenshot capture and management
+ * Uses screenshot_agent.exe as single source of truth for all captures
  */
 class ScreenshotManager {
   constructor(outputDir, config) {
@@ -34,7 +33,31 @@ class ScreenshotManager {
   }
 
   /**
-   * Capture screenshot
+   * Execute screenshot_agent.exe to capture active window
+   * @param {string} outputPath - Absolute path to save screenshot
+   */
+  async executeScreenshotAgent(outputPath) {
+    return new Promise((resolve, reject) => {
+      // Use screenshot agent from project root
+      const agentPath = path.resolve(process.cwd(), 'screenshot_agent.exe');
+
+      if (!fs.existsSync(agentPath)) {
+        return reject(new Error(`screenshot_agent.exe not found at ${agentPath}`));
+      }
+
+      execFile(agentPath, [outputPath], { windowsHide: true }, err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  /**
+   * Capture screenshot using screenshot_agent.exe
+   * Single source of truth for all screenshot captures
    */
   async capture(page, testName, phase, stepIndex) {
     if (!this.config.screenshots || !this.config.screenshots.enabled) {
@@ -45,12 +68,25 @@ class ScreenshotManager {
       const filename = this.generateFilename(testName, phase, stepIndex);
       const filepath = path.join(this.screenshotsDir, filename);
 
-      await page.screenshot({ path: filepath, fullPage: true });
+      // Ensure directory exists
+      await fs.ensureDir(path.dirname(filepath));
+
+      // Bring browser window to front to ensure it's the active window
+      await page.bringToFront();
+
+      // Small delay to ensure window is active
+      await page.waitForTimeout(100);
+
+      // Execute screenshot_agent.exe to capture active window
+      await this.executeScreenshotAgent(filepath);
+
+      Logger.debug(`Screenshot captured: ${filename}`);
 
       // Return relative path for HTML report
       return `screenshots/${filename}`;
     } catch (error) {
-      Logger.error(`Failed to capture screenshot: ${error.message}`);
+      // Log as warning, don't fail the test
+      Logger.warn(`Screenshot capture failed: ${error.message}`);
       return null;
     }
   }
@@ -121,31 +157,6 @@ class ScreenshotManager {
     }
 
     return null;
-  }
-
-  /**
-   * Ch?p m?n h?nh c?a s? ?ang active (OS-level)
-   * @param {string} outputPath - ???ng d?n tuy?t ??i t?i file ?nh
-   */
-  captureWindow(outputPath) {
-    return new Promise((resolve, reject) => {
-      const exePath = path.resolve(process.cwd(), 'bin', 'screenshot_agent.exe');
-
-      if (!fs.existsSync(exePath)) {
-        return reject(new Error(`screenshot_agent.exe not found at ${exePath}`));
-      }
-
-      // ??m b?o folder t?n t?i
-      fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-
-      execFile(exePath, [outputPath], { windowsHide: true }, err => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
   }
 }
 

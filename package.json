@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "node index.js",
-    "start": "node index.js",
+    "test": "node index.js tests/create_denpyo.yaml",
+    "start": "node index.js --popup tests/create_denpyo.yaml",
     "format": "prettier --write .",
     "prepare": "husky"
   },

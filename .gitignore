@@ -4,3 +4,4 @@ report/
 .DS_Store
 .env
 build/
+screenshots/popup/
