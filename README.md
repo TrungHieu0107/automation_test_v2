@@ -1,426 +1,413 @@
-# YAML-Driven Web Automation Framework
+# Automation Test Framework v2.0
 
-> **Professional test automation framework with enterprise-grade HTML reporting**
-
-## Overview
-
-A modern, YAML-driven web automation testing framework built on Playwright, designed for enterprise QA teams. Define complex multi-step test scenarios using simple YAML syntax, capture detailed execution reports with screenshots, and organize tests with parent-child composition for maximum reusability and maintainability.
-
-### Key Purpose
-
-This framework enables:
-
-- **Declarative Testing**: Write tests in clean YAML without coding
-- **Unified Actions Architecture**: Mix fill, click, dialog, and navigation actions in a single sequential flow
-- **Visual Documentation**: Automatic screenshot capture at critical test points
-- **Professional Reporting**: Enterprise-grade HTML reports with glassmorphism UI and dark theme
-- **Modular Test Design**: File-based test composition with parent-child relationships
-- **Multi-Browser Support**: Run tests on Edge, Chrome, Firefox, and Safari via Playwright
+A powerful, YAML-driven automation testing framework built on Playwright with professional HTML reporting capabilities. This framework enables you to write automated browser tests using simple YAML configuration files without writing any code.
 
 ## Features
 
-- ✅ **YAML-Driven Tests** - Define tests using simple YAML syntax
-- ✅ **Unified Actions Phase** - Sequential execution of fill, click, dialog, and navigation in one flow
-- ✅ **File-Based Test Composition** - Modular test organization with parent-child file references
-- ✅ **Flexible Selectors** - Support for id, name, css, xpath selector strategies
-- ✅ **Multi-Element Support** - input, textarea, select, checkbox, radio buttons
-- ✅ **Rich Assertions** - textContent, inputValue, visibility, enabled, style with operators
-- ✅ **Smart Screenshot Capture** - Fine-grained control with automatic fallback and dialog capture
-- ✅ **Professional HTML Reports** - Modern UI with glassmorphism and dark theme
-- ✅ **Browser State Preservation** - No restarts between parent and child tests
-- ✅ **Hierarchical Test Visualization** - Clear parent→child relationships in reports
-- ✅ **Multiple Browser Support** - Edge, Chrome, Firefox, Safari (via Playwright)
-- ✅ **Configurable Execution** - Control failure behavior and state restoration
-- ✅ **Circular Dependency Detection** - Prevents infinite test loops
-- ✅ **SOLID Principles** - Extensible architecture with Strategy and Factory patterns
+- **YAML-Driven Testing** - Write tests in simple YAML format, no coding required
+- **Professional HTML Reports** - Beautiful, responsive HTML reports with screenshots and execution details
+- **Parent-Child Test Structure** - Organize complex test scenarios with hierarchical test relationships
+- **Multiple Selector Strategies** - Support for CSS, ID, Name, and XPath selectors
+- **Rich Assertion Library** - Comprehensive assertion types with multiple operators (equals, contains, regex)
+- **Smart Screenshot Management** - Automatic and manual screenshot capture with failure detection
+- **Cross-Browser Support** - Test on Chrome, Firefox, Edge, and more
+- **Flexible Action System** - Sequential actions with support for fills, clicks, waits, and dialogs
+- **Backward Compatible** - Supports both legacy and modern test formats
 
-## Installation
+## Quick Start
+
+### Prerequisites
+
+- **Node.js** (v14 or higher)
+- **npm** or **yarn**
+
+### Installation
 
 ```bash
+# Clone the repository
+git clone <repository-url>
+cd automation_test_v2
+
+# Install dependencies
 npm install
+
+# Install Playwright browsers (first time only)
+npx playwright install
 ```
 
-## Usage
-
-### Run Tests
+### Running Your First Test
 
 ```bash
-# Run test with default browser
+# Run the default sample test
 npm test
 
-# Run specific test file
+# Run a specific test file
+npm test tests/sample-test.yaml
+
+# Or using node directly
 node index.js tests/your-test.yaml
 ```
 
-### Test Structure
+## Project Structure
 
-#### Modern Test with Unified Actions Phase
-
-```yaml
-name: Create Denpyo
-description: Create a new denpyo entry with product information
-url: http://example.com/form
-
-# ACTIONS PHASE - Sequential execution of all actions
-actions:
-  # Fill initial fields
-  - type: fill
-    selector: '[name="username"]'
-    value: 'admin'
-    capture: true # Optional: capture screenshot after this step
-
-  # Click button
-  - type: click
-    selector: '[name="search"]'
-
-  # Wait for search results
-  - type: waitForNavigation
-    timeout: 3000
-
-  # Fill fields after navigation (dynamic form)
-  - type: fill
-    selector: '[name="product_code"]'
-    value: '12345'
-    capture: true
-
-  # Click confirm button
-  - type: click
-    selector: '[name="confirm"]'
-    capture: true
-
-  # Handle confirmation dialog
-  - type: dialog
-    action: accept # or 'dismiss'
-    capture: true # Captures screenshot of dialog
-
-  # Wait after dialog
-  - type: waitForNavigation
-    timeout: 2000
-
-# ASSERTIONS - Verify success
-assertions:
-  - type: exists
-    selector: '.success-message'
-    timeout: 5000
-
-# CHILDREN - Execute after parent completes
-children:
-  - path: children/update-profile.yaml
-  - path: children/logout.yaml
 ```
-
-#### Child Test (reuses parent browser state)
-
-```yaml
-name: Update Profile
-
-# ACTIONS PHASE
-actions:
-  # Fill fields with explicit selector strategy
-  - type: fill
-    selector:
-      by: name
-      value: 'profileName'
-    value: 'John Doe'
-    capture: true # Optional: capture screenshot after this step
-
-  # Legacy format also supported (CSS selector)
-  - type: fill
-    selector: '#email'
-    value: 'john@example.com'
-    capture: true
-
-  # Click save button
-  - type: click
-    selector: '#saveBtn'
-
-# ASSERTIONS - Rich assertion capabilities
-assertions:
-  # Text content with operators
-  - type: textContent
-    selector: '.success'
-    expected: 'Profile updated'
-    operator: contains
-
-  # Visibility assertion
-  - type: visibility
-    selector: '.success'
-    expected: visible
+automation_test_v2/
+������ src/
+��   ������ actions/          # Action execution logic
+��   ��   ������ strategies/   # Fill, click, checkbox, radio button actions
+��   ������ assertions/       # Assertion engine
+��   ��   ������ strategies/   # Text, visibility, input value assertions
+��   ������ core/            # Core test execution engine
+��   ������ models/          # Data models
+��   ������ reporting/       # HTML report generation
+��   ������ selectors/       # Selector resolution strategies
+��   ������ utils/           # Configuration and logging utilities
+������ tests/               # Test YAML files
+��   ������ children/        # Child test files
+������ report/              # Generated HTML reports
+������ config.yaml          # Framework configuration
+������ index.js             # Main entry point
+������ package.json         # Project dependencies
 ```
 
 ## Configuration
 
-Edit `config.yaml` to customize:
+Edit `config.yaml` to customize framework behavior:
 
 ```yaml
 browser:
-  type: msedge # msedge, chrome, firefox, webkit
-  headless: false # Show browser window
+  type: msedge # Browser type: chrome, firefox, msedge, webkit
+  headless: false # Run with UI (false) or headless (true)
+  viewport:
+    width: 1535
+    height: 1024
 
 report:
-  enabled: true
-  outputDir: report/
-  openAfterExecution: true
+  enabled: true # Enable HTML reporting
+  outputDir: report/ # Report output directory
+  openAfterExecution: true # Auto-open report in browser
+  theme: default # Report theme
 
 screenshots:
-  enabled: true
-  onFailure: true
-  # Per-step control via YAML (capture: true)
-  # Automatic fallback before/after submit if no explicit captures
+  enabled: true # Enable screenshot capture
+  onFailure: true # Auto-capture on test failures
 
 testExecution:
-  stopOnChildFailure: false # Continue with next child if one fails
-  restoreBrowserState: true # Navigate back to parent URL after each child
+  stopOnChildFailure: false # Continue or stop on child test failure
+  restoreBrowserState: true # Restore browser after each child test
+
+childTests:
+  validatePaths: true # Validate child file paths
+  detectCircularRefs: true # Detect circular dependencies
 ```
 
-## Advanced Features
+## Writing Tests
 
-### Unified Actions Phase
+### Basic Test Structure
 
-The modern framework architecture uses a single `actions` phase for sequential execution of all test actions. This replaces the legacy `fillData` and `submit` phases with a more flexible approach.
-
-**Supported Action Types:**
-
-- `fill` - Fill input fields, textareas, selects, checkboxes
-- `click` - Click buttons, links, or any element
-- `dialog` - Handle browser dialogs (alert, confirm, prompt)
-- `waitForNavigation` - Wait for page loads and navigation
-
-**Benefits:**
-
-- ✅ Sequential execution in defined order
-- ✅ Mix action types freely (fill → click → dialog → wait)
-- ✅ Better handling of dynamic forms (fill after search/navigation)
-- ✅ Screenshot capture at any step with `capture: true`
-
-**Dialog Handling Example:**
+Create a YAML file in the `tests/` directory:
 
 ```yaml
+name: My First Test
+description: Test login functionality
+url: https://example.com/login
+
+# Define actions to perform
 actions:
-  # Submit form
-  - type: click
-    selector: '#submitBtn'
-    capture: true # Screenshot before dialog appears
-
-  # Handle confirmation dialog
-  - type: dialog
-    action: accept # or 'dismiss'
-    capture: true # Screenshot of the dialog
-
-  # Wait for post-dialog navigation
-  - type: waitForNavigation
-    timeout: 2000
-
-  # Handle second dialog if needed
-  - type: dialog
-    action: accept
-    capture: true
-```
-
-**Dynamic Form Example:**
-
-```yaml
-actions:
-  # Initial search
   - type: fill
-    selector: '#searchField'
-    value: 'product123'
+    selector: '#username'
+    value: 'testuser'
+
+  - type: fill
+    selector: '#password'
+    value: 'password123'
 
   - type: click
-    selector: '#searchBtn'
+    selector: '#login-button'
 
-  # Wait for results
   - type: waitForNavigation
+    timeout: 5000
+
+# Define assertions to verify
+assertions:
+  - type: urlContains
+    expected: 'dashboard'
+
+  - type: exists
+    selector: '.welcome-message'
     timeout: 3000
-
-  # Fill fields that appear after search
-  - type: fill
-    selector: '#quantity'
-    value: '10'
-    capture: true
 ```
 
-### Selector Strategies
-
-Support for multiple selector types:
+### Legacy Format (Still Supported)
 
 ```yaml
+name: Login Test
+url: https://example.com/login
+
 fillData:
-  # ID selector
-  - selector:
-      by: id
-      value: 'username'
-    value: 'admin'
+  - selector: '#username'
+    value: 'testuser'
+  - selector: '#password'
+    value: 'password123'
 
-  # Name selector
-  - selector:
-      by: name
-      value: 'email'
-    value: 'user@example.com'
+submit:
+  - type: click
+    selector: '#login-button'
+  - type: waitForNavigation
+    timeout: 5000
 
-  # CSS selector (default)
-  - selector:
-      by: css
-      value: '.login-form input[type="submit"]'
-    value: 'Login'
-
-  # XPath selector
-  - selector:
-      by: xpath
-      value: '//input[@type="password"]'
-    value: 'secret123'
+assertions:
+  - type: exists
+    selector: '.dashboard'
 ```
 
-### Element Type Support
+## Supported Actions
 
-Framework auto-detects element types:
+### Modern Actions Format
 
-- **Input fields**: text, email, password, etc.
-- **Textarea**: multi-line text input
-- **Select dropdowns**: Select by value, label, or index
-- **Checkboxes**: check/uncheck
-- **Radio buttons**: selection
+| Action Type         | Description                    | Required Fields           | Optional Fields |
+| ------------------- | ------------------------------ | ------------------------- | --------------- |
+| `fill`              | Fill input or textarea         | `selector`, `value`       | `capture`       |
+| `click`             | Click an element               | `selector`                | `capture`       |
+| `dialog`            | Handle browser alerts/confirms | `action` (accept/dismiss) | -               |
+| `waitForNavigation` | Wait for page navigation       | -                         | `timeout`       |
 
-```yaml
-fillData:
-  # Select dropdown by value
-  - selector: '#country'
-    value: 'USA'
-    options:
-      selectBy: value # or 'label' or 'index'
+### Legacy Fill Data Types
 
-  # Checkbox
-  - selector: '#terms'
-    value: true # or 'checked', 'yes', '1'
-    action: checkbox
-```
+| Data Type  | Description       | Example Selector |
+| ---------- | ----------------- | ---------------- |
+| `input`    | Text input fields | `#username`      |
+| `textarea` | Textarea fields   | `#description`   |
+| `checkbox` | Checkbox inputs   | `#agree-terms`   |
+| `radio`    | Radio buttons     | `#option-yes`    |
+| `select`   | Dropdown selects  | `#country`       |
 
-### Rich Assertions
+## Supported Assertions
 
-Multiple assertion types with operators:
+### Modern Assertions with Operators
+
+| Assertion Type | Description         | Operators                     | Example               |
+| -------------- | ------------------- | ----------------------------- | --------------------- |
+| `textContent`  | Verify element text | `equals`, `contains`, `regex` | See below             |
+| `inputValue`   | Verify input value  | `equals`, `contains`, `regex` | See below             |
+| `visibility`   | Check visibility    | N/A                           | `visible` or `hidden` |
+| `enabled`      | Check if enabled    | N/A                           | `true` or `false`     |
+| `style`        | Verify CSS styles   | `equals`, `contains`          | See below             |
+
+**Example with Operators:**
 
 ```yaml
 assertions:
-  # Text content with operators
   - type: textContent
     selector: '.message'
     expected: 'Success'
-    operator: equals # or 'contains' or 'regex'
+    operator: contains # equals, contains, or regex
 
-  # Input value assertion
-  - type: inputValue
-    selector: '#username'
-    expected: 'admin'
-    operator: equals
-
-  # Visibility assertion
-  - type: visibility
-    selector: '.error'
-    expected: hidden # or 'visible'
-
-  # Enabled/disabled state
-  - type: enabled
-    selector: '#submitBtn'
-    expected: enabled # or 'disabled'
-
-  # CSS style assertion
-  - type: style
-    selector: '.success'
-    property: color
-    expected: 'rgb(0, 128, 0)'
+  - type: textContent
+    selector: '.email'
+    expected: '^[a-z]+@example\.com$'
+    operator: regex
 ```
 
-### Screenshot Configuration
+### Legacy Assertions (Still Supported)
 
-Per-step control with automatic fallback:
+| Type          | Description            | Fields                     |
+| ------------- | ---------------------- | -------------------------- |
+| `exists`      | Element exists in DOM  | `selector`, `timeout`      |
+| `text`        | Element has exact text | `selector`, `expectedText` |
+| `urlContains` | URL contains string    | `expectedUrl`              |
+
+## Selector Strategies
+
+### Simple String Selector (CSS)
 
 ```yaml
-fillData:
-  # Explicit capture
-  - selector: '#username'
+selector: '#username'
+selector: '.button-primary'
+selector: 'input[type="email"]'
+```
+
+### Advanced Selector Object
+
+```yaml
+# CSS Selector (default)
+selector:
+  by: css
+  value: '.login-form input'
+
+# ID Selector (auto-adds #)
+selector:
+  by: id
+  value: username
+
+# Name Attribute Selector
+selector:
+  by: name
+  value: email
+
+# XPath Selector
+selector:
+  by: xpath
+  value: //button[contains(text(), 'Submit')]
+```
+
+## Parent-Child Tests
+
+Organize complex test scenarios with parent-child relationships:
+
+**Parent Test** (`tests/parent-test.yaml`):
+
+```yaml
+name: Login and Dashboard Test
+url: https://example.com
+
+actions:
+  - type: fill
+    selector: '#username'
     value: 'admin'
-    capture: true # Screenshot taken after this step
+  - type: click
+    selector: '#login'
 
-  # No capture
-  - selector: '#password'
-    value: 'secret'
-    # No capture property - no screenshot
+assertions:
+  - type: exists
+    selector: '.dashboard'
+
+children:
+  - path: children/create-record.yaml
+  - path: children/edit-record.yaml
 ```
 
-**Fallback Behavior**:
+**Child Test** (`tests/children/create-record.yaml`):
 
-- If **no step** has `capture: true`, framework automatically:
-  - Captures screenshot **before submit**
-  - Captures screenshot **after submit**
-- If **any step** has `capture: true`, no fallback screenshots
+```yaml
+name: Create New Record
+url: https://example.com/records/new
 
-## Report Features
+actions:
+  - type: fill
+    selector: '#record-name'
+    value: 'Test Record'
+  - type: click
+    selector: '#save'
 
-The HTML report includes:
-
-- **Dashboard** with test statistics and execution time
-- **Test Hierarchy Tree** showing parent-child relationships
-- **Step-by-Step Details** with screenshots and timing
-- **Assertion Results** with expected vs actual comparisons
-- **Error Tracking** with collapsible stack traces
-- **Screenshot Modal** for full-size previews
-
-## File-Based Test Composition
-
-### Benefits
-
-- 🔹 **Modularity** - Each test is a separate, reusable file
-- 🔹 **Maintainability** - Easier to update and version control
-- 🔹 **Scalability** - Large test suites remain organized
-- 🔹 **Reusability** - Child tests can be used by multiple parents
-- 🔹 **Performance** - No browser restarts, faster execution
-
-### Path Resolution
-
-Child paths are resolved relative to the parent test file:
-
-```
-tests/
-├── parent-test.yaml          # References: children/test1.yaml
-├── children/
-│   ├── test1.yaml
-│   └── test2.yaml
-└── shared/
-    └── common-test.yaml      # Reusable test
+assertions:
+  - type: textContent
+    selector: '.success-message'
+    expected: 'Record created'
+    operator: contains
 ```
 
-### Browser State Preservation
+## Screenshots
 
-When running parent→child tests:
+### Automatic Screenshots
 
-- Browser session persists (cookies, localStorage, sessionStorage)
-- No page refresh between tests
-- Child starts from parent's final URL
-- Optional: restore parent URL between children (configurable)
+- **On Failure**: Automatically captured when assertions fail (if `screenshots.onFailure: true`)
+- **Before/After Submit**: Fallback screenshots if no explicit captures defined
 
-## Architecture
+### Manual Screenshots
 
+Add `capture: true` to any action:
+
+```yaml
+actions:
+  - type: fill
+    selector: '#search'
+    value: 'test query'
+    capture: true # Takes screenshot after this action
+
+  - type: click
+    selector: '#search-button'
+    capture: true
 ```
-src/
-├── core/
-│   ├── TestExecutor.js           # Main test orchestrator
-│   ├── TestFileLoader.js         # YAML file loading with circular detection
-│   ├── TestOrchestrator.js       # Parent-child execution flow
-│   └── ExecutionContextStack.js  # Browser state management
-├── models/
-│   ├── TestReport.js             # Test execution data
-│   └── StepReport.js             # Step-level details
-├── actions/
-│   ├── ActionHandler.js          # Browser actions
-│   └── ScreenshotManager.js      # Screenshot capture
-├── assertions/
-│   └── AssertionEngine.js        # Assertion validation
-└── reporting/
-    ├── ReportManager.js          # Report coordination
-    ├── ReportAggregator.js       # Data aggregation
-    └── HtmlReportGenerator.js    # HTML generation
+
+## HTML Reports
+
+After test execution, an HTML report is automatically generated in the `report/` directory with:
+
+- Test execution summary (passed/failed)
+- Detailed step-by-step execution log
+- Embedded screenshots at each capture point
+- Assertion results with expected vs actual values
+- Execution timestamps and durations
+- Parent-child test hierarchy visualization
+
+The report automatically opens in your default browser if `report.openAfterExecution: true`.
+
+## Example Test Files
+
+The framework includes several example tests in the `tests/` directory:
+
+- **`sample-test.yaml`** - Basic test with parent-child structure
+- **`assertion-operators-demo.yaml`** - Demonstrates all assertion operators
+- **`selector-strategies-demo.yaml`** - Shows all selector strategies
+- **`explicit-screenshot-demo.yaml`** - Manual screenshot examples
+- **`parent-test.yaml`** - Parent-child test organization
+
+## Development
+
+### Code Formatting
+
+```bash
+# Format all code with Prettier
+npm run format
 ```
+
+### Pre-commit Hooks
+
+The project uses Husky and lint-staged to automatically format code before commits:
+
+- All files are automatically formatted with Prettier on commit
+- Ensures consistent code style across the project
+
+## Troubleshooting
+
+### Browser Not Launching
+
+```bash
+# Reinstall Playwright browsers
+npx playwright install
+```
+
+### Test File Not Found
+
+- Ensure the test file path is relative to the project root
+- Use forward slashes `/` in paths, even on Windows
+
+### Screenshots Not Appearing
+
+- Check `config.yaml` - ensure `screenshots.enabled: true`
+- Verify the `report/` directory exists
+- Check browser permissions for screenshot capture
+
+### Report Not Opening
+
+- Set `report.openAfterExecution: false` if auto-open causes issues
+- Manually open `report/test-report.html` in your browser
+
+## Additional Resources
+
+- [Playwright Documentation](https://playwright.dev/)
+- [YAML Syntax Guide](https://yaml.org/)
+- [CSS Selector Reference](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors)
+- [XPath Tutorial](https://www.w3schools.com/xml/xpath_intro.asp)
+- **[Test Scenario Guide](TEST_SCENARIO_GUIDE.md)** - Detailed guide on creating test scenarios
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-MIT
+This project is licensed under the MIT License.
+
+## Acknowledgments
+
+Built with [Playwright](https://playwright.dev/) - the modern web automation framework.
+
+---
+
+**Happy Testing!**
