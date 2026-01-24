@@ -20,23 +20,13 @@ async function main() {
     const isPopupMode = process.argv.includes('--popup');
     const testFile = process.argv.find(arg => arg.endsWith('.yaml')) || './tests/sample-test.yaml';
 
-    if (isPopupMode) {
-      Logger.info('🖼️  POPUP SCREENSHOT MODE');
-      Logger.info(`Test file: ${testFile}`);
+    // Normal test execution
+    const executor = new TestExecutor(config);
+    Logger.info(`Running test file: ${testFile}`);
 
-      const popupCapture = new PopupScreenshotCapture(config);
-      await popupCapture.captureFromTestFile(testFile);
+    await executor.run(testFile);
 
-      Logger.success('\n✓ Popup screenshot captured successfully!');
-    } else {
-      // Normal test execution
-      const executor = new TestExecutor(config);
-      Logger.info(`Running test file: ${testFile}`);
-
-      await executor.run(testFile);
-
-      Logger.success('\n✓ Test execution completed successfully!');
-    }
+    Logger.success('\n✓ Test execution completed successfully!');
 
     process.exit(0);
   } catch (error) {
